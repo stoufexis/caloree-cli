@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 module Model.FoodPreview
-  ( FoodPreview
+  ( FoodPreview(..)
   ) where
 import           Colonnade                      ( ascii
                                                 , headed
@@ -14,11 +14,12 @@ import           GHC.Generics                   ( Generic )
 import           Model.Types                    ( Description(..)
                                                 , Id(Id)
                                                 , Verbosity(..)
+                                                , trimmed
                                                 )
 import           Typeclass.Tabled
 
 data FoodPreview = FoodPreview
-  { id          :: Id FoodPreview
+  { id          :: Id
   , description :: Description
   }
   deriving (Show, Generic)
@@ -31,8 +32,11 @@ instance Tabled FoodPreview where
    where
     fromTable Minimal =
       headed "id" $ show . (\(Id x) -> x) . Model.FoodPreview.id . snd
-    fromTable _ = mconcat
+
+    fromTable v' = fromTableTrimmed $ trimmed v'
+
+    fromTableTrimmed trim = mconcat
       [ headed "#" (pretty . fst)
       , fromTable Minimal
-      , headed "description" ((\(Description x) -> x) . description . snd)
+      , headed "description" (pretty . trim . description . snd)
       ]

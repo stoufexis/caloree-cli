@@ -13,7 +13,7 @@ import           Model.Types                    ( Description
                                                 )
 
 data Log = Log
-  { id          :: Id Log
+  { id          :: Id
   , day         :: Text
   , minute      :: Minute
   , description :: Description

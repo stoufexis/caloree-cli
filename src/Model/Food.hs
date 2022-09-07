@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 module Model.Food
-  ( Food
+  ( Food(..)
   ) where
 import           Colonnade                      ( ascii
                                                 , headed
@@ -20,13 +20,14 @@ import           Model.Types                    ( Amount(Amount)
                                                   , Normal
                                                   , Verbose
                                                   )
+                                                , trimmed
                                                 )
 import           Typeclass.Tabled               ( Tabled(..) )
 
 data Food = Food
-  { id          :: Id Food
+  { id          :: Id
   , description :: Description
-  , amount      :: Amount
+  , grams       :: Amount
   , nutrients   :: Nutrients
   }
   deriving (Show, Generic)
@@ -37,17 +38,20 @@ instance FromJSON Food
 instance Tabled Food where
   table v = ascii (fromTable v) . indexed
    where
-    fromTable Minimal = mconcat
+    fromTableBase v' = mconcat
       [ headed "#" $ pretty . fst
-      , headed "description" $ (\(Description x) -> x) . description . snd
-      , headed "amount" $ pretty . (\(Amount x) -> x) . amount . snd
+      , headed "description" $ pretty . trimmed v' . description . snd
+      , headed "amount" $ pretty . (\(Amount x) -> x) . grams . snd
       ]
-    fromTable Normal =
-      fromTable Minimal <> headed "energy" (pretty . energy . nutrients . snd)
-    fromTable Verbose = mconcat
-      [ fromTable Normal
+
+    fromTableExtra Minimal = mempty
+    fromTableExtra Normal  = headed "energy" (pretty . energy . nutrients . snd)
+    fromTableExtra Verbose = mconcat
+      [ fromTableExtra Normal
       , headed "protein" $ pretty . protein . nutrients . snd
       , headed "carbs" $ pretty . carbs . nutrients . snd
       , headed "fat" $ pretty . fat . nutrients . snd
       , headed "fiber" $ pretty . fiber . nutrients . snd
       ]
+
+    fromTable v' = fromTableBase v' <> fromTableExtra v'
