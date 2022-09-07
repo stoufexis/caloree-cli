@@ -1,66 +1,39 @@
+{-# OPTIONS_GHC -Wno-unused-matches #-}
+{-# OPTIONS_GHC -Wno-missing-signatures #-}
 module Http.Common
-  ( reqSecure
-  , reqUnsecure
+  ( reqUnsecure
   ) where
-
-import           Control.Monad.RWS              ( MonadReader(ask), MonadIO  )
-import           Data.Aeson                     ( FromJSON )
-import           Data.Text                      ( Text )
+import           Control.Monad.RWS              ( MonadIO
+                                                , MonadReader(ask)
+                                                )
+import           Data.Data                      ( Proxy )
 import           Model.Config                   ( AppConfig(..) )
 import           Network.HTTP.Req
 import qualified Network.HTTP.Req              as REQ
-import Data.ByteString (ByteString)
 
-makeReq
-  :: ( HttpBodyAllowed (AllowsBody method) (ProvidesBody body)
-     , MonadReader AppConfig m
-     , MonadIO m
-     , HttpMethod method
-     , HttpBody body
-     , FromJSON a
-     )
-  => (Text -> Url scheme)
-  -> (ByteString -> ByteString -> Option scheme)
-  -> method
-  -> Text
-  -> body
-  -> Option scheme
-  -> m (JsonResponse a)
-makeReq fhttp fauth method path body params =
-  ask >>= (\cnf -> runReq defaultHttpConfig $ req method (makeUri cnf) body jsonResponse (makeParams cnf))
+makeReq fhttp fauth method fpath body response params = ask >>= run
  where
-  makeUri (AppConfig { host }) = fhttp host /: path
+  run cnf = runReq defaultHttpConfig
+    $ req method (makeUri cnf) body response (makeParams cnf)
+
+  makeUri (AppConfig { host }) = fpath $ fhttp host
+
   makeParams (AppConfig { username, password, port = p }) =
     fauth username password <> REQ.port p <> params
 
 
-reqSecure
-  :: ( HttpBodyAllowed (AllowsBody method) (ProvidesBody body)
-     , MonadIO m
-     , MonadReader AppConfig m
-     , HttpMethod method
-     , HttpBody body
-     , FromJSON a
-     )
-  => method
-  -> Text
-  -> body
-  -> Option 'Https
-  -> m (JsonResponse a)
-reqSecure = makeReq https basicAuth
-
-
 reqUnsecure
-  :: ( HttpBodyAllowed (AllowsBody method) (ProvidesBody body)
-     , MonadIO m
+  :: ( HttpBodyAllowed (AllowsBody p1) (ProvidesBody p2)
      , MonadReader AppConfig m
-     , HttpMethod method
-     , HttpBody body
-     , FromJSON a
+     , MonadIO m
+     , HttpMethod p1
+     , HttpBody p2
+     , HttpResponse b
      )
-  => method
-  -> Text
-  -> body
-  -> Option 'Http
-  -> m (JsonResponse a)
+  => p1
+  -> (Url 'Http -> Url scheme)
+  -> p2
+  -> Proxy b
+  -> Option scheme
+  -> m b
 reqUnsecure = makeReq http basicAuthUnsafe
