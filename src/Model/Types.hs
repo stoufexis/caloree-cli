@@ -5,6 +5,7 @@ module Model.Types
   , Id(..)
   , Minute(..)
   , Description(..)
+  , trimmed
   , Date(..)
   , Time(..)
   , Offset(..)
@@ -13,38 +14,19 @@ module Model.Types
 import           Data.Aeson                     ( FromJSON
                                                 , ToJSON
                                                 )
+import           Data.Text                      ( Text )
+import qualified Data.Text                     as T
 import           GHC.Generics                   ( Generic )
+import           Typeclass.WithDefault          ( WithDefault(..) )
 
 
-data Verbosity = Minimal | Normal | Verbose deriving (Show, Generic)
+data Verbosity = Minimal | Normal | Verbose
 
-instance ToJSON Verbosity
-instance FromJSON Verbosity
-
-newtype Amount = Amount Integer deriving (Show, Generic)
-
-instance ToJSON Amount
-instance FromJSON Amount
-
-newtype Id a = Id Integer deriving (Show, Generic)
-
-instance ToJSON (Id a)
-instance FromJSON (Id a)
-
-newtype Minute = Minute Integer deriving (Show, Generic)
-
-instance ToJSON Minute
-instance FromJSON Minute
-
-newtype Description = Description String deriving (Show, Generic)
-
-instance ToJSON Description
-instance FromJSON Description
-
-newtype Offset = Offset String deriving (Show, Generic)
-
-instance ToJSON Offset
-instance FromJSON Offset
+newtype Amount      = Amount Integer
+newtype Id          = Id Integer
+newtype Minute      = Minute Integer
+newtype Description = Description Text
+newtype Offset      = Offset String
 
 -- year month day
 data Date = Date
@@ -52,26 +34,68 @@ data Date = Date
   , month :: Int
   , day   :: Int
   }
-  deriving (Show, Generic)
-
-instance ToJSON Date
-instance FromJSON Date
 
 -- hour minute
 data Time = Time
   { hour   :: Int
   , minute :: Int
   }
-  deriving (Show, Generic)
-
-instance ToJSON Time
-instance FromJSON Time
 
 data PageLimit = PageLimit
   { page  :: Integer
   , limit :: Integer
   }
-  deriving (Show, Generic)
 
+trimmed :: Verbosity -> Description -> Text
+trimmed Minimal (Description d) = T.take 50 d
+trimmed Normal  (Description d) = T.take 100 d
+trimmed Verbose (Description d) = d
+
+instance WithDefault PageLimit where
+  withDefault = PageLimit { page = 0, limit = 25 }
+
+instance WithDefault Verbosity where
+  withDefault = Normal
+
+instance WithDefault Amount where
+  withDefault = Amount 100
+
+deriving instance Show Verbosity
+deriving instance Show Amount
+deriving instance Show Id
+deriving instance Show Minute
+deriving instance Show Description
+deriving instance Show Offset
+deriving instance Show Time
+deriving instance Show Date
+deriving instance Show PageLimit
+
+deriving instance Generic Verbosity
+deriving instance Generic Amount
+deriving instance Generic Id
+deriving instance Generic Minute
+deriving instance Generic Description
+deriving instance Generic Offset
+deriving instance Generic Time
+deriving instance Generic Date
+deriving instance Generic PageLimit
+
+instance ToJSON Verbosity
+instance ToJSON Amount
+instance ToJSON Id
+instance ToJSON Minute
+instance ToJSON Description
+instance ToJSON Offset
+instance ToJSON Date
+instance ToJSON Time
 instance ToJSON PageLimit
+
+instance FromJSON Verbosity
+instance FromJSON Amount
+instance FromJSON Id
+instance FromJSON Minute
+instance FromJSON Description
+instance FromJSON Offset
+instance FromJSON Date
+instance FromJSON Time
 instance FromJSON PageLimit
