@@ -1,44 +1,32 @@
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 module Model.Command
-  ( Verbosity
-  , Command
+  ( Verbosity(..)
+  , Command(..)
   ) where
-import           Model.CustomFood
-import           Model.Food
 import           Model.Nutrients
 import           Model.Types
+import Model.Types (Amount(Amount))
 
 data LogFilters = LogFilters
-  { grouping :: Minute
-  , group    :: Integer
-  , date     :: Date
-  , fid      :: Either (Id Food) (Id CustomFood)
-  , offset   :: Offset
-  }
-
-data FoodSearchParams = FoodSearchParams
-  { foodSearchVerbosity   :: Verbosity
-  , foodSearchDescription :: Description
-  , foodSearchPageLimit   :: PageLimit
-  }
-
-data FoodViewParams = FoodViewParams
-  { foodViewVerbosity :: Verbosity
-  , foodViewId        :: Id Food
-  , foodViewAmount    :: Amount
+  { grouping :: Maybe Minute
+  , group    :: Maybe Integer
+  , date     :: Maybe Date
+  , fid      :: Maybe Id
+  , offset   :: Maybe Offset
   }
 
 data Command = AddLog (Amount, Date, Time, Integer)
              | UpdateLog (LogFilters, Amount)
              | DeleteLog LogFilters
              | UndoLog LogFilters
-             | ViewLog (Verbosity, LogFilters, PageLimit)
-             | SearchFood FoodSearchParams
-             | ViewFood FoodViewParams
+             | ViewLog (Maybe Verbosity, LogFilters, PageLimit)
+             | SearchFood (Maybe Verbosity, Description, Maybe PageLimit )
+             | ViewFood (Maybe Verbosity, Id, Maybe Amount)
+             | SearchCustomFood (Maybe Verbosity, Description, Maybe PageLimit )
+             | ViewCustomFood (Maybe Verbosity, Id, Maybe Amount )
              | AddCustomFood (Description, Nutrients)
-             | DeleteFood Integer
-             | SearchCustomFood FoodSearchParams
-             | ViewCustomFood FoodViewParams
+             | DeleteCustomFood Id
+
 
 --  log
 --    - add    --amount <grams> --day <date> --time <time>  <food_id>
