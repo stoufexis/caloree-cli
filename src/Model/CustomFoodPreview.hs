@@ -4,19 +4,28 @@ module Model.CustomFoodPreview
 import           Data.Aeson                     ( FromJSON
                                                 , ToJSON
                                                 )
+import qualified Data.Vector                   as V
 import           GHC.Generics                   ( Generic )
+import           Model.FoodPreview              ( FoodPreview(..) )
 import           Model.Types                    ( Description
                                                 , Id
                                                 )
-import           Model.User                     ( User )
+import           Typeclass.Tabled               ( Tabled(..) )
+
 
 data CustomFoodPreview = CustomFoodPreview
-  { id          :: Id CustomFoodPreview
-  , userId      :: Id User
+  { id          :: Id
+  , userId      :: Id
   , description :: Description
   }
   deriving (Show, Generic)
 
-instance ToJSON CustomFoodPreview
 instance FromJSON CustomFoodPreview
+instance ToJSON CustomFoodPreview
+
+instance Tabled CustomFoodPreview where
+  table v = table v . V.map asFood
+   where
+    asFood (CustomFoodPreview { id, description }) =
+      FoodPreview { id, description }
 
