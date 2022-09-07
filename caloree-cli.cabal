@@ -25,7 +25,9 @@ source-repository head
 
 library
   exposed-modules:
+      Dto.CustomFoodDto
       Http.Common
+      Http.CustomFoodRequest
       Http.FoodRequest
       Lib
       Model.Command
@@ -38,9 +40,8 @@ library
       Model.Nutrients
       Model.Types
       Model.User
-      Tmp
-      Typeclass.Requested
       Typeclass.Tabled
+      Typeclass.WithDefault
   other-modules:
       Paths_caloree_cli
   hs-source-dirs:
@@ -68,6 +69,9 @@ library
       TypeOperators
       DataKinds
       KindSignatures
+      LambdaCase
+      GADTs
+      StandaloneDeriving
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       aeson
@@ -112,6 +116,9 @@ executable caloree-cli-exe
       TypeOperators
       DataKinds
       KindSignatures
+      LambdaCase
+      GADTs
+      StandaloneDeriving
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
@@ -158,6 +165,9 @@ test-suite caloree-cli-test
       TypeOperators
       DataKinds
       KindSignatures
+      LambdaCase
+      GADTs
+      StandaloneDeriving
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson

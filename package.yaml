@@ -66,6 +66,9 @@ default-extensions:
   - TypeOperators
   - DataKinds
   - KindSignatures
+  - LambdaCase
+  - GADTs
+  - StandaloneDeriving
 
 library:
   source-dirs: src
