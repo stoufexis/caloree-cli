@@ -1,107 +1,53 @@
+{-# OPTIONS_GHC -Wno-unused-top-binds #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use <$>" #-}
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 module Lib
   ( someFunc
   ) where
-import           Colonnade                      ( ascii
-                                                , headed
+import           Control.Monad.Reader
+import qualified Data.Vector                   as V
+import           Http.CustomFoodRequest         ( addCustomFood
+                                                , deleteCustomFood
+                                                , getCustomFood
+                                                , getCustomFoods
                                                 )
-import           Data.Text
-import           Data.Vector                    ( Vector, indexed )
-import           Fmt
-import           Network.HTTP.Req               ( defaultHttpConfig
-                                                , runReq
+import           Http.FoodRequest               ( getFood
+                                                , getFoods
                                                 )
+import           Model.Command                  ( Command(..) )
+import           Model.Config                   ( AppConfig(..) )
+import           Model.Types
+import           Typeclass.Tabled
+import           Typeclass.WithDefault          ( def )
+
 someFunc :: IO ()
-someFunc = putStr $ showMeals $ indexed meals
+someFunc = putStrLn "Hello World!"
 
--- someFunc :: IO ()
--- someFunc = runReq defaultHttpConfig getFoodsByDescription >>= print
+execute :: (Functor m, Tabled a) => m [a] -> Verbosity -> m String
+execute req v = fmap (table v . V.fromList) req
 
--- input :: IO ()
--- input = do
---   clearScreen
---   setCursorPosition 0 0
---   line <- getLine
---   putStrLn $ "You said: " <> line
---   someFunc
+execute_ :: (Monad m) => m () -> m String
+execute_ req = req >> pure "Ok!"
 
-data MealFood = MealFood
-  { mealName :: String
-  , foodName :: String
-  , amount   :: Int
-  }
+type AppIO = ReaderT AppConfig IO
 
-data Change a = None a | Added a | Updated a a | Deleted a deriving (Functor)
+executeCommand :: (MonadReader AppConfig m, MonadIO m) => Command -> m String
+executeCommand = \case
+  SearchFood       (v, d, pl) -> execute (getFoods (d, def pl)) (def v)
+  ViewFood         (v, i, a ) -> execute (getFood (i, def a)) (def v)
+  SearchCustomFood (v, d, pl) -> execute (getCustomFoods (d, def pl)) (def v)
+  ViewCustomFood   (v, i, a ) -> execute (getCustomFood (i, def a)) (def v)
+  AddCustomFood    (d, n)     -> execute_ (addCustomFood (d, n))
+  DeleteCustomFood i          -> execute_ (deleteCustomFood i)
 
-meals :: Vector (Change MealFood)
-meals =
-  [ Added MealFood { mealName = "Breakfast"
-                   , foodName = "Bread, whole wheat"
-                   , amount   = 125
-                   }
-  , None MealFood { mealName = "Lunch"
-                  , foodName = "Protein Drink, Vanilla"
-                  , amount   = 500
-                  }
-  , Deleted MealFood { mealName = "Breakfast"
-                     , foodName = "Pork, Grounded, 93% lean"
-                     , amount   = 200
-                     }
-  , Added MealFood { mealName = "Dinner"
-                   , foodName = "Bread, whole wheat"
-                   , amount   = 125
-                   }
-  , Added MealFood { mealName = "Dinner"
-                   , foodName = "Pork, Grounded, 80% Lean"
-                   , amount   = 200
-                   }
-  , Updated
-    MealFood { mealName = "Dinner"
-             , foodName = "Spinach, Baby, Raw"
-             , amount   = 300
-             }
-    MealFood { mealName = "Dinner"
-             , foodName = "Spinach, Baby, Raw"
-             , amount   = 250
-             }
-  ]
-
-showMeals :: Vector (Int, Change MealFood) -> String
-showMeals = ascii formTable
+run :: IO ()
+run = runReaderT (exec >>= liftIO . putStrLn) cnf
  where
-  formTable = mconcat
-    [ headed ""       (show . fst)
-    , headed "Meal"   (displayBefore . fmap mealName . snd)
-    , headed "Food"   (displayBefore . fmap foodName . snd)
-    , headed "Amount" (displayBefore . fmap amount . snd)
-    , headed ""       (pretty . changeSymbol . snd)
-    , headed "Meal"   (displayAfter . fmap mealName . snd)
-    , headed "Food"   (displayAfter . fmap foodName . snd)
-    , headed "Amount" (displayAfter . fmap amount . snd)
-    ]
-
-  displayBefore :: Buildable a => Change a -> String
-  displayBefore = pretty . display before . fmap build
-
-  displayAfter :: Buildable a => Change a -> String
-  displayAfter = pretty . display after . fmap build
-
-  display :: Buildable a => (Change Builder -> Maybe a) -> Change a -> Text
-  display f x = pretty $ f $ fmap build x
-
-  changeSymbol :: Change MealFood -> Builder
-  changeSymbol (Added   _  ) = "++"
-  changeSymbol (Deleted _  ) = "--"
-  changeSymbol (None    _  ) = "~~"
-  changeSymbol (Updated _ _) = "->"
-
-  after (Added   x   ) = Just x
-  after (Deleted _   ) = Nothing
-  after (None    x   ) = Just x
-  after (Updated _ x') = Just x'
-
-  before (Added   _  ) = Nothing
-  before (Deleted x  ) = Just x
-  before (None    x  ) = Just x
-  before (Updated x _) = Just x
-
-
+  exec = executeCommand
+    (ViewCustomFood (Nothing, Id 1, Nothing))
+  cnf = AppConfig { host     = "localhost"
+                  , port     = 8080
+                  , username = "stef1"
+                  , password = "password1"
+                  }
