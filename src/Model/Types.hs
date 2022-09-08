@@ -13,9 +13,7 @@ module Model.Types
   , Group(..)
   , Inteval(..)
   ) where
-import           Data.Aeson                     ( FromJSON
-                                                , ToJSON
-                                                )
+import           Data.Aeson.Types
 import           Data.Text                      ( Text )
 import qualified Data.Text                     as T
 import           Fmt
@@ -25,6 +23,7 @@ import           Typeclass.AsQueryParam         ( AsQueryParam(..) )
 import           Typeclass.WithDefault          ( WithDefault(..)
                                                 , def
                                                 )
+import Control.Applicative
 
 
 data Verbosity = Minimal | Normal | Verbose
@@ -37,6 +36,25 @@ newtype Minute      = Minute Integer
 newtype Description = Description Text
 newtype Offset      = Offset Integer
 newtype Group       = Group Integer
+
+-- Either custom_food_id food_id
+newtype EFID = EFID (Either Id Id) deriving (Show)
+
+instance ToJSON EFID where
+  toJSON (EFID (Left  i)) = object ["custom_food_id" .= i]
+  toJSON (EFID (Right i)) = object ["food_id" .= i]
+
+  toEncoding (EFID (Left  i)) = pairs ("custom_food_id" .= i)
+  toEncoding (EFID (Right i)) = pairs ("food_id" .= i)
+
+instance FromJSON EFID where
+  parseJSON v = i v <|> i' v
+   where
+    i :: Value -> Parser EFID
+    i = fmap (EFID . Left) . withObject "EFID" (.: "custom_food_id")
+
+    i' :: Value -> Parser EFID
+    i' = fmap (EFID . Right) . withObject "EFID" (.: "food_id")
 
 -- year month day
 data Date = Date
