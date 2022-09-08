@@ -1,29 +1,37 @@
 module Dto.AddLog
   ( AddLogDto(..)
-  , FID(..)
   ) where
-import           Data.Aeson                     ( FromJSON
-                                                , ToJSON
-                                                )
+import           Data.Aeson.Types
 import           Data.Text                      ( Text )
 import           GHC.Generics                   ( Generic )
-import           Model.Types                    ( Amount
-                                                , Id
-                                                , Minute
-                                                )
-newtype FID = FID {food_id :: Id} deriving (Show, Generic)
-
-instance ToJSON FID
-instance FromJSON FID
+import           Model.Types
 
 data AddLogDto = AddLogDto
-  { t      :: Text
-  , fid    :: FID
+  { fid    :: Id
   , amount :: Amount
   , day    :: Text
   , minute :: Minute
   }
   deriving (Show, Generic)
 
-instance ToJSON AddLogDto
-instance FromJSON AddLogDto
+instance ToJSON AddLogDto where
+  toJSON (AddLogDto { fid, amount, day, minute }) = object
+    [ "t" .= ("Add" :: String)
+    , "fid" .= fid
+    , "amount" .= amount
+    , "day" .= day
+    , "minute" .= minute
+    ]
+
+  toEncoding (AddLogDto { fid, amount, day, minute }) = pairs
+    (  "t"
+    .= ("Add" :: String)
+    <> "fid"
+    .= fid
+    <> "amount"
+    .= amount
+    <> "day"
+    .= day
+    <> "minute"
+    .= minute
+    )
