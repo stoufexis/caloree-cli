@@ -2,24 +2,23 @@
 module Model.Command
   ( Verbosity(..)
   , Command(..)
+  , LogFilters(..)
   ) where
 import           Model.Nutrients
 import           Model.Types
-import Model.Types (Amount(Amount))
 
 data LogFilters = LogFilters
-  { grouping :: Maybe Minute
-  , group    :: Maybe Integer
+  { interval :: Maybe Inteval
   , date     :: Maybe Date
   , fid      :: Maybe Id
-  , offset   :: Maybe Offset
+  , cfid     :: Maybe Id
   }
 
-data Command = AddLog (Amount, Date, Time, Integer)
+data Command = AddLog (Amount, Date, Time, Id)
              | UpdateLog (LogFilters, Amount)
              | DeleteLog LogFilters
              | UndoLog LogFilters
-             | ViewLog (Maybe Verbosity, LogFilters, PageLimit)
+             | ViewLog (Maybe Verbosity, LogFilters, Maybe PageLimit)
              | SearchFood (Maybe Verbosity, Description, Maybe PageLimit )
              | ViewFood (Maybe Verbosity, Id, Maybe Amount)
              | SearchCustomFood (Maybe Verbosity, Description, Maybe PageLimit )

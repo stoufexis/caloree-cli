@@ -31,6 +31,7 @@ dependencies:
 - transformers
 - bytestring
 - utf8-string
+- profunctors
 
 ghc-options:
 - -Wall

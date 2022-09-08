@@ -25,10 +25,12 @@ source-repository head
 
 library
   exposed-modules:
+      Dto.AddLog
       Dto.CustomFoodDto
       Http.Common
       Http.CustomFoodRequest
       Http.FoodRequest
+      Http.LogRequest
       Lib
       Model.Command
       Model.Config
@@ -40,6 +42,7 @@ library
       Model.Nutrients
       Model.Types
       Model.User
+      Typeclass.AsQueryParam
       Typeclass.Tabled
       Typeclass.WithDefault
   other-modules:
@@ -80,6 +83,7 @@ library
     , colonnade
     , fmt
     , mtl
+    , profunctors
     , req
     , text
     , transformers
@@ -128,6 +132,7 @@ executable caloree-cli-exe
     , colonnade
     , fmt
     , mtl
+    , profunctors
     , req
     , text
     , transformers
@@ -177,6 +182,7 @@ test-suite caloree-cli-test
     , colonnade
     , fmt
     , mtl
+    , profunctors
     , req
     , text
     , transformers

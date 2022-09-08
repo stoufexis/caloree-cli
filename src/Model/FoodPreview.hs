@@ -5,18 +5,12 @@ module Model.FoodPreview
 import           Colonnade                      ( ascii
                                                 , headed
                                                 )
-import           Data.Aeson                     ( FromJSON
-                                                , ToJSON
-                                                )
-import           Data.Vector                    ( indexed )
+import           Data.Aeson
 import qualified Data.Vector                   as V
-import           Fmt                            ( pretty )
-import           GHC.Generics                   ( Generic )
-import           Model.Types                    ( Description(..)
-                                                , Id(Id)
-                                                , Verbosity(..)
-                                                , trimmed
-                                                )
+import           Data.Vector                    ( indexed )
+import           Fmt
+import           GHC.Generics
+import           Model.Types
 import           Typeclass.Tabled
 
 data FoodPreview = FoodPreview
@@ -29,19 +23,23 @@ instance ToJSON FoodPreview
 instance FromJSON FoodPreview
 
 instance Tabled FoodPreview where
-  table Minimal = pretty . (\(Id x) -> x) . Model.FoodPreview.id . V.head
-  table Normal  = ascii fromTable . indexed
-   where
-    fromTable = mconcat
-      [ headed "#" (pretty . fst)
-      , headed "id" $ pretty . (\(Id x) -> x) . Model.FoodPreview.id . snd
-      , headed "description" (pretty . trimmed Normal . description . snd)
-      ]
+  colonnade Minimal = mconcat
+    [ headed "#" (pretty . fst)
+    , headed "id" $ pretty . (\(Id x) -> x) . Model.FoodPreview.id . snd
+    ]
 
-  table Verbose = ascii fromTable . indexed
-   where
-    fromTable = mconcat
-      [ headed "#" (pretty . fst)
-      , headed "id" $ pretty . (\(Id x) -> x) . Model.FoodPreview.id . snd
-      , headed "description" (pretty . trimmed Verbose . description . snd)
-      ]
+  colonnade Normal = mconcat
+    [ headed "#" (pretty . fst)
+    , headed "id" $ pretty . (\(Id x) -> x) . Model.FoodPreview.id . snd
+    , headed "description" (pretty . trimmed Normal . description . snd)
+    ]
+
+  colonnade Verbose = mconcat
+    [ headed "#" (pretty . fst)
+    , headed "id" $ pretty . (\(Id x) -> x) . Model.FoodPreview.id . snd
+    , headed "description" (pretty . trimmed Verbose . description . snd)
+    ]
+
+  table Minimal = pretty . (\(Id x) -> x) . Model.FoodPreview.id . V.head
+  table v       = ascii (colonnade v) . indexed
+
