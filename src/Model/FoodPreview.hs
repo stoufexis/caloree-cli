@@ -9,6 +9,7 @@ import           Data.Aeson                     ( FromJSON
                                                 , ToJSON
                                                 )
 import           Data.Vector                    ( indexed )
+import qualified Data.Vector                   as V
 import           Fmt                            ( pretty )
 import           GHC.Generics                   ( Generic )
 import           Model.Types                    ( Description(..)
@@ -28,15 +29,19 @@ instance ToJSON FoodPreview
 instance FromJSON FoodPreview
 
 instance Tabled FoodPreview where
-  table v = ascii (fromTable v) . indexed
+  table Minimal = pretty . (\(Id x) -> x) . Model.FoodPreview.id . V.head
+  table Normal  = ascii fromTable . indexed
    where
-    fromTable Minimal =
-      headed "id" $ show . (\(Id x) -> x) . Model.FoodPreview.id . snd
-
-    fromTable v' = fromTableTrimmed $ trimmed v'
-
-    fromTableTrimmed trim = mconcat
+    fromTable = mconcat
       [ headed "#" (pretty . fst)
-      , fromTable Minimal
-      , headed "description" (pretty . trim . description . snd)
+      , headed "id" $ pretty . (\(Id x) -> x) . Model.FoodPreview.id . snd
+      , headed "description" (pretty . trimmed Normal . description . snd)
+      ]
+
+  table Verbose = ascii fromTable . indexed
+   where
+    fromTable = mconcat
+      [ headed "#" (pretty . fst)
+      , headed "id" $ pretty . (\(Id x) -> x) . Model.FoodPreview.id . snd
+      , headed "description" (pretty . trimmed Verbose . description . snd)
       ]

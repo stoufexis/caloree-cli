@@ -9,12 +9,13 @@ import           Data.Aeson                     ( FromJSON
                                                 , ToJSON
                                                 )
 import           Data.Vector                    ( indexed )
+import qualified Data.Vector                   as V
 import           Fmt                            ( pretty )
 import           GHC.Generics                   ( Generic )
 import           Model.Nutrients                ( Nutrients(..) )
 import           Model.Types                    ( Amount(Amount)
                                                 , Description(..)
-                                                , Id
+                                                , Id(Id)
                                                 , Verbosity
                                                   ( Minimal
                                                   , Normal
@@ -36,22 +37,29 @@ instance ToJSON Food
 instance FromJSON Food
 
 instance Tabled Food where
-  table v = ascii (fromTable v) . indexed
+  table Minimal = pretty . (\(Id i) -> i) . Model.Food.id . V.head
+
+  table Normal  = ascii fromTable . indexed
    where
-    fromTableBase v' = mconcat
-      [ headed "#" $ pretty . fst
-      , headed "description" $ pretty . trimmed v' . description . snd
+    fromTable = mconcat
+      [ headed "energy" (pretty . energy . nutrients . snd)
+      , headed "#" $ pretty . fst
+      , headed "id" $ pretty . (\(Id i) -> i) . Model.Food.id . snd
+      , headed "description" $ pretty . trimmed Normal . description . snd
       , headed "amount" $ pretty . (\(Amount x) -> x) . grams . snd
       ]
 
-    fromTableExtra Minimal = mempty
-    fromTableExtra Normal  = headed "energy" (pretty . energy . nutrients . snd)
-    fromTableExtra Verbose = mconcat
-      [ fromTableExtra Normal
+  table Verbose = ascii fromTable . indexed
+   where
+    fromTable = mconcat
+      [ headed "energy" (pretty . energy . nutrients . snd)
+      , headed "#" $ pretty . fst
+      , headed "id" $ pretty . (\(Id i) -> i) . Model.Food.id . snd
+      , headed "description" $ pretty . trimmed Verbose . description . snd
+      , headed "amount" $ pretty . (\(Amount x) -> x) . grams . snd
       , headed "protein" $ pretty . protein . nutrients . snd
       , headed "carbs" $ pretty . carbs . nutrients . snd
       , headed "fat" $ pretty . fat . nutrients . snd
       , headed "fiber" $ pretty . fiber . nutrients . snd
       ]
 
-    fromTable v' = fromTableBase v' <> fromTableExtra v'
