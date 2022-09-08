@@ -2,12 +2,12 @@
 module Model.Food
   ( Food(..)
   ) where
-import           Colonnade                      ( ascii
-                                                , headed
-                                                )
+import           Colonnade                      ( headed )
+import           Control.Arrow                  ( Arrow(second) )
 import           Data.Aeson                     ( FromJSON
                                                 , ToJSON
                                                 )
+import           Data.Profunctor                ( Profunctor(lmap) )
 import           Fmt                            ( pretty )
 import           GHC.Generics                   ( Generic )
 import           Model.Nutrients                ( Nutrients(..) )
@@ -54,9 +54,7 @@ instance Tabled Food where
     , headed "id" $ pretty . (\(Id i) -> i) . Model.Food.id . snd
     , headed "description" $ pretty . trimmed Verbose . description . snd
     , headed "amount" $ pretty . (\(Amount x) -> x) . grams . snd
-    , headed "protein" $ pretty . protein . nutrients . snd
-    , headed "carbs" $ pretty . carbs . nutrients . snd
-    , headed "fat" $ pretty . fat . nutrients . snd
-    , headed "fiber" $ pretty . fiber . nutrients . snd
+    , ncol
     ]
+    where ncol = lmap (second nutrients) $ colonnade Verbose
 

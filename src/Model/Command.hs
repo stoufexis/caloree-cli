@@ -14,7 +14,7 @@ data LogFilters = LogFilters
   , cfid     :: Maybe Id
   }
 
-data Command = AddLog (Amount, Date, Time, Id)
+data Command = AddLog (Amount, Date, Time, EFID)
              | UpdateLog (LogFilters, Amount)
              | DeleteLog LogFilters
              | UndoLog LogFilters

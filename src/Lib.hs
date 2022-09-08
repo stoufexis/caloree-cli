@@ -68,3 +68,20 @@ run = runReaderT (exec >>= liftIO . putStrLn) cnf
                   , password = "password1"
                   , date     = Date { year = 2022, month = 9, day = 8 }
                   }
+run' :: IO ()
+run' = runReaderT (exec >>= liftIO . putStrLn) cnf
+ where
+  exec = executeCommand
+    (AddLog
+      ( Amount 100
+      , Date { year = 2022, month = 9, day = 8 }
+      , Time { hour = 16, minute = 27 }
+      , EFID $ Right $ Id 167786
+      )
+    )
+  cnf = AppConfig { host     = "localhost"
+                  , port     = 8080
+                  , username = "stef1"
+                  , password = "password1"
+                  , date     = Date { year = 2022, month = 9, day = 8 }
+                  }

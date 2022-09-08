@@ -7,7 +7,7 @@ import           GHC.Generics                   ( Generic )
 import           Model.Types
 
 data AddLogDto = AddLogDto
-  { fid    :: Id
+  { fid    :: EFID
   , amount :: Amount
   , day    :: Text
   , minute :: Minute

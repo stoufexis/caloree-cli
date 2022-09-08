@@ -15,6 +15,7 @@ import           Model.Config
 import           Model.Log                      ( Log )
 import           Model.Types                    ( Amount
                                                 , Date(..)
+                                                , EFID
                                                 , Id(Id)
                                                 , Minute(Minute)
                                                 , Offset(Offset)
@@ -47,7 +48,7 @@ getLogsRequest (pl, fs) = fmap responseBody request
   filtersParam (LogFilters { interval }) = qparam $ def interval
 
 addLogRequest
-  :: (MonadReader AppConfig m, MonadIO m) => (Amount, Date, Time, Id) -> m ()
+  :: (MonadReader AppConfig m, MonadIO m) => (Amount, Date, Time, EFID) -> m ()
 addLogRequest (a, Date { year, month, day }, Time { hour, minute }, i) =
   request >> pure ()
  where

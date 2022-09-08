@@ -12,7 +12,9 @@ module Model.Types
   , PageLimit(..)
   , Group(..)
   , Inteval(..)
+  , EFID(..)
   ) where
+import           Control.Applicative
 import           Data.Aeson.Types
 import           Data.Text                      ( Text )
 import qualified Data.Text                     as T
@@ -23,7 +25,6 @@ import           Typeclass.AsQueryParam         ( AsQueryParam(..) )
 import           Typeclass.WithDefault          ( WithDefault(..)
                                                 , def
                                                 )
-import Control.Applicative
 
 
 data Verbosity = Minimal | Normal | Verbose

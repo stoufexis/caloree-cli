@@ -5,8 +5,10 @@ import           Colonnade                      ( headed )
 import           Data.Aeson                     ( FromJSON
                                                 , ToJSON
                                                 )
-import           Fmt                            ( pretty )
+import           Data.Text                      ( Text )
+import           Fmt
 import           GHC.Generics                   ( Generic )
+import           Model.Types                    ( Verbosity(Verbose) )
 import           Typeclass.Tabled
 
 data Nutrients = Nutrients
@@ -22,10 +24,17 @@ instance ToJSON Nutrients
 instance FromJSON Nutrients
 
 instance Tabled Nutrients where
-  colonnade _ = mconcat
-    [ headed "energy" $ pretty . energy . snd
-    , headed "protein" $ pretty . protein . snd
-    , headed "carbs" $ pretty . carbs . snd
-    , headed "fat" $ pretty . fat . snd
-    , headed "fiber" $ pretty . fiber . snd
+  colonnade v = mconcat
+    [ headed "energy" $ present energy "kcal"
+    , headed "protein" $ present protein "gr"
+    , headed "carbs" $ present carbs "gr"
+    , headed "fat" $ present fat "gr"
+    , headed "fiber" $ present fiber "gr"
     ]
+   where
+    present f u = (|+ " " +| u) . rnd . f . snd
+
+    rnd :: Float -> Text
+    rnd n = case v of
+      Verbose -> pretty n
+      _       -> pretty (round n :: Integer)
