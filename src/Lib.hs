@@ -53,7 +53,7 @@ run = runReaderT (exec >>= liftIO . putStrLn) cnf
  where
   exec = executeCommand
     (ViewLog
-      ( Nothing
+      ( Just Normal
       , LogFilters { interval = Nothing
                    , date     = Nothing
                    , fid      = Nothing

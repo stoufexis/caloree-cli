@@ -16,6 +16,7 @@ import           Model.Types                    ( Amount(Amount)
                                                 , EFID(EFID)
                                                 , Id(Id)
                                                 , Minute(Minute)
+                                                , Verbosity(..)
                                                 , trimmed
                                                 )
 import           Typeclass.Tabled               ( Tabled(..) )
@@ -39,8 +40,11 @@ instance Tabled Log where
     , headed "id" $ pretty . idcol . Model.Log.id . snd
     , headed "description" $ pretty . trimmed v . description . snd
     , headed "time" $ time . minute . snd
-    , headed "amount" $ pretty . (\(Amount a) -> a) . amount . snd
-    , ncol
+    , headed "amount" $ (\(Amount a) -> a |+ " gr") . amount . snd
+    , case v of
+      Verbose -> ncol
+      Normal  -> ncol
+      Minimal -> mempty
     ]
    where
     time (Minute m) = "" +| m `div` 60 |+ ":" +| m `mod` 60 |+ ""
