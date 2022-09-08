@@ -7,9 +7,7 @@ module Http.LogRequest
   ) where
 import           Control.Monad.RWS
 import           Data.Text                      ( Text )
-import           Dto.AddLog                     ( AddLogDto(..)
-                                                , FID(..)
-                                                )
+import           Dto.AddLog                     ( AddLogDto(..) )
 import           Fmt
 import           Http.Common                    ( reqUnsecure )
 import           Model.Command                  ( LogFilters(..) )
@@ -58,13 +56,11 @@ addLogRequest (a, Date { year, month, day }, Time { hour, minute }, i) =
   d :: Text
   d    = if day < 10 then "0" +| day |+ "" else pretty day
 
-  body = ReqBodyJson AddLogDto
-    { t      = "Add"
-    , fid    = FID { food_id = i }
-    , amount = a
-    , day    = "" +| year |+ "-" +| m |+ "-" +| d |+ ""
-    , minute = Minute (hour * 60 + minute)
-    }
+  body = ReqBodyJson AddLogDto { fid    = i
+                               , amount = a
+                               , day = "" +| year |+ "-" +| m |+ "-" +| d |+ ""
+                               , minute = Minute (hour * 60 + minute)
+                               }
 
   request = reqUnsecure POST (/: "log") body ignoreResponse mempty
 
