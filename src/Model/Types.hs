@@ -31,7 +31,7 @@ import           Typeclass.WithDefault          ( WithDefault(..)
 
 data Verbosity = Minimal | Normal | Verbose
 
-newtype Inteval = Inteval (Maybe Minute, Maybe Group, Maybe Offset)
+newtype Inteval = Inteval (Maybe Minute, Maybe Group, Maybe Offset) deriving Show
 
 newtype Amount      = Amount Integer
 newtype Id          = Id Integer
@@ -42,22 +42,6 @@ newtype Group       = Group Integer
 
 -- Either custom_food_id food_id
 newtype EFID = EFID (Either Id Id) deriving (Show)
-
-instance ToJSON EFID where
-  toJSON (EFID (Left  i)) = object ["custom_food_id" .= i]
-  toJSON (EFID (Right i)) = object ["food_id" .= i]
-
-  toEncoding (EFID (Left  i)) = pairs ("custom_food_id" .= i)
-  toEncoding (EFID (Right i)) = pairs ("food_id" .= i)
-
-instance FromJSON EFID where
-  parseJSON v = i v <|> i' v
-   where
-    i :: Value -> Parser EFID
-    i = fmap (EFID . Left) . withObject "EFID" (.: "custom_food_id")
-
-    i' :: Value -> Parser EFID
-    i' = fmap (EFID . Right) . withObject "EFID" (.: "food_id")
 
 -- year month day
 data Date = Date
@@ -104,6 +88,10 @@ instance AsQueryParam Inteval where
         end        = start + m
     in  "interval" =: (("" +| start |+ "-" +| end |+ "") :: String)
 
+instance AsQueryParam EFID where
+  qparam (EFID (Right (Id i))) = "food_id" =: i
+  qparam (EFID (Left  (Id i))) = "custom_food_id" =: i
+
 instance AsQueryParam Description where
   qparam (Description d) = "description" =: d
 
@@ -118,7 +106,6 @@ instance AsQueryParam PageLimit where
 
 instance AsQueryParam Date where
   qparam d = "date" =: formatted d
-
 
 instance WithDefault Inteval where
   withDefault = Inteval (Just withDefault, Just withDefault, Just withDefault)
@@ -163,6 +150,30 @@ deriving instance Generic Time
 deriving instance Generic Date
 deriving instance Generic PageLimit
 
+instance ToJSON EFID where
+  toJSON (EFID (Left  i)) = object ["custom_food_id" .= i]
+  toJSON (EFID (Right i)) = object ["food_id" .= i]
+
+  toEncoding (EFID (Left  i)) = pairs ("custom_food_id" .= i)
+  toEncoding (EFID (Right i)) = pairs ("food_id" .= i)
+
+instance ToJSON Inteval where
+  toJSON (Inteval (grouping, group, offset)) =
+    let (Offset o) = def offset
+        (Minute m) = def grouping
+        (Group  g) = def group
+        start      = m * g + o
+        end        = start + m
+    in  object ["start" .= start, "end" .= end]
+
+  toEncoding (Inteval (grouping, group, offset)) =
+    let (Offset o) = def offset
+        (Minute m) = def grouping
+        (Group  g) = def group
+        start      = m * g + o
+        end        = start + m
+    in  pairs ("start" .= start <> "end" .= end)
+
 instance ToJSON Group
 instance ToJSON Verbosity
 instance ToJSON Amount
@@ -173,6 +184,15 @@ instance ToJSON Offset
 instance ToJSON Date
 instance ToJSON Time
 instance ToJSON PageLimit
+
+instance FromJSON EFID where
+  parseJSON v = i v <|> i' v
+   where
+    i :: Value -> Parser EFID
+    i = fmap (EFID . Left) . withObject "EFID" (.: "custom_food_id")
+
+    i' :: Value -> Parser EFID
+    i' = fmap (EFID . Right) . withObject "EFID" (.: "food_id")
 
 instance FromJSON Group
 instance FromJSON Verbosity

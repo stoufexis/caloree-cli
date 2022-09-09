@@ -3,26 +3,32 @@ module Model.Command
   ( Verbosity(..)
   , Command(..)
   , LogFilters(..)
+  , dateOrDefault
   ) where
 import           Model.Nutrients
 import           Model.Types
+import Control.Monad.RWS (MonadReader (ask))
+import Model.Config (AppConfig(..))
 
 data LogFilters = LogFilters
   { interval :: Maybe Inteval
   , date     :: Maybe Date
-  , fid      :: Maybe Id
-  , cfid     :: Maybe Id
+  , fid      :: Maybe EFID
   }
+
+dateOrDefault :: MonadReader AppConfig m => LogFilters -> m Date
+dateOrDefault (LogFilters { date = Just d }) = pure d
+dateOrDefault _ = fmap (\(AppConfig { date = d }) -> d) ask
 
 data Command = AddLog Amount Date Time EFID
              | UpdateLog LogFilters Amount
-             | DeleteLog LogFilters
-             | UndoLog LogFilters
-             | ViewLog ( Maybe Verbosity ) LogFilters ( Maybe PageLimit )
-             | SearchFood ( Maybe Verbosity ) Description ( Maybe PageLimit )
-             | ViewFood ( Maybe Verbosity ) Id ( Maybe Amount )
-             | SearchCustomFood ( Maybe Verbosity ) Description ( Maybe PageLimit )
-             | ViewCustomFood ( Maybe Verbosity ) Id ( Maybe Amount )
+             | RemoveLog LogFilters
+             | UndoLog LogFilters Int
+             | ViewLog (Maybe Verbosity) LogFilters (Maybe PageLimit)
+             | SearchFood (Maybe Verbosity) Description (Maybe PageLimit)
+             | ViewFood (Maybe Verbosity) Id (Maybe Amount)
+             | SearchCustomFood (Maybe Verbosity) Description (Maybe PageLimit)
+             | ViewCustomFood (Maybe Verbosity) Id (Maybe Amount)
              | AddCustomFood Description Nutrients
              | DeleteCustomFood Id
 

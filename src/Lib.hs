@@ -17,10 +17,11 @@ import           Http.FoodRequest               ( getFood
                                                 )
 import           Http.LogRequest                ( addLogRequest
                                                 , getLogsRequest
+                                                , removeLogRequest
+                                                , undoLogRequest
+                                                , updateLogRequest
                                                 )
-import           Model.Command                  ( Command(..)
-                                                , LogFilters(..)
-                                                )
+import           Model.Command                  ( Command(..) )
 import           Model.Config                   ( AppConfig(..) )
 import           Model.Types
 import           Typeclass.Tabled
@@ -39,14 +40,18 @@ type AppIO = ReaderT AppConfig IO
 
 executeCommand :: (MonadReader AppConfig m, MonadIO m) => Command -> m String
 executeCommand = \case
-  SearchFood       v d pl -> execute (getFoods d $ def pl) (def v)
-  ViewFood         v i a  -> execute (getFood i $ def a) (def v)
-  SearchCustomFood v d pl -> execute (getCustomFoods d $ def pl) (def v)
-  ViewCustomFood   v i a  -> execute (getCustomFood i $ def a) (def v)
-  ViewLog          v l pl -> execute (getLogsRequest (def pl) l) (def v)
+  SearchFood       v d pl -> execute (getFoods d pl) (def v)
+  ViewFood         v i a  -> execute (getFood i a) (def v)
+  SearchCustomFood v d pl -> execute (getCustomFoods d pl) (def v)
+  ViewCustomFood   v i a  -> execute (getCustomFood i a) (def v)
 
+  ViewLog          v l pl -> execute (getLogsRequest pl l) (def v)
   AddLog a d t i          -> execute_ (addLogRequest a d t i)
-  AddCustomFood d n       -> execute_ (addCustomFood d n)
+  UpdateLog lf a          -> execute_ (updateLogRequest lf a)
+  RemoveLog lf            -> execute_ (removeLogRequest lf)
+  UndoLog       lf times  -> execute_ (undoLogRequest lf times)
+
+  AddCustomFood d  n      -> execute_ (addCustomFood d n)
   DeleteCustomFood i      -> execute_ (deleteCustomFood i)
 
 -- run :: IO ()

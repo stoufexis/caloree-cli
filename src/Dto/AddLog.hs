@@ -3,7 +3,6 @@ module Dto.AddLog
   ) where
 import           Data.Aeson.Types
 import           Data.Text                      ( Text )
-import           GHC.Generics                   ( Generic )
 import           Model.Types
 
 data AddLogDto = AddLogDto
@@ -12,7 +11,7 @@ data AddLogDto = AddLogDto
   , day    :: Text
   , minute :: Minute
   }
-  deriving (Show, Generic)
+  deriving Show
 
 instance ToJSON AddLogDto where
   toJSON (AddLogDto { fid, amount, day, minute }) = object

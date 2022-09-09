@@ -4,20 +4,25 @@
 module Http.LogRequest
   ( addLogRequest
   , getLogsRequest
+  , removeLogRequest
+  , undoLogRequest
+  , updateLogRequest
   ) where
 import           Control.Monad.RWS
-import           Data.Text                      ( Text )
+import           Data.Aeson                     ( ToJSON )
 import           Dto.AddLog                     ( AddLogDto(..) )
-import           Fmt
+import           Dto.RemoveLog                  ( RemoveLogDto(..) )
+import           Dto.UndoLog                    ( UndoLogDto(UndoLogDto) )
+import           Dto.UpdateLog                  ( ModifyLogDto(ModifyLogDto) )
 import           Http.Common                    ( reqUnsecure )
-import           Model.Command                  ( LogFilters(..) )
+import           Model.Command                  ( LogFilters(..)
+                                                , dateOrDefault
+                                                )
 import           Model.Config
 import           Model.Log                      ( Log )
 import           Model.Types                    ( Amount
                                                 , Date(..)
                                                 , EFID
-                                                , Id(Id)
-                                                , Minute(Minute)
                                                 , Offset(Offset)
                                                 , PageLimit(..)
                                                 , Time(..)
@@ -29,25 +34,29 @@ import           Typeclass.AsQueryParam         ( AsQueryParam(qparam) )
 import           Typeclass.WithDefault          ( def )
 
 getLogsRequest
-  :: (MonadReader AppConfig m, MonadIO m) => PageLimit -> LogFilters -> m [Log]
+  :: (MonadReader AppConfig m, MonadIO m)
+  => Maybe PageLimit
+  -> LogFilters
+  -> m [Log]
 getLogsRequest pl fs = fmap responseBody request
  where
-  request = params >>= reqUnsecure GET path NoReqBody jsonResponse
+  request =
+    dateOrDefault fs
+      >>= reqUnsecure GET (/: "log") NoReqBody jsonResponse
+      .   makeParams
 
-  path    = (/: "log")
+  makeParams x =
+    qparam x <> idParam fs <> intervalParam fs <> qparam (def pl) <> qparam
+      (Offset 0)
 
-  params  = fmap
-    (\x -> x <> idParam fs <> filtersParam fs <> qparam pl <> qparam (Offset 0))
-    (dateParam fs)
+  idParam LogFilters { fid = Just i } = qparam i
+  idParam _                           = mempty
 
-  dateParam (LogFilters { date = Just d }) = pure $ qparam d
-  dateParam _ = fmap (\(AppConfig { date = d }) -> qparam d) ask
+  intervalParam = qparam . def . interval
 
-  idParam LogFilters { fid = Just (Id i) } = "food_id" =: i
-  idParam LogFilters { cfid = Just (Id i) } = "custom_food_id" =: i
-  idParam _ = mempty
-
-  filtersParam (LogFilters { interval }) = qparam $ def interval
+postLog
+  :: (MonadReader AppConfig m, MonadIO m, ToJSON a) => a -> m IgnoreResponse
+postLog b = reqUnsecure POST (/: "log") (ReqBodyJson b) ignoreResponse mempty
 
 addLogRequest
   :: (MonadReader AppConfig m, MonadIO m)
@@ -56,13 +65,22 @@ addLogRequest
   -> Time
   -> EFID
   -> m ()
-addLogRequest a d t i = request >> pure ()
- where
-  body = ReqBodyJson AddLogDto { fid    = i
-                               , amount = a
-                               , day    = formatted d
-                               , minute = timeToMinutes t
-                               }
+addLogRequest amount date time fid = postLog body >> pure ()
+  where body = AddLogDto fid amount (formatted date) (timeToMinutes time)
 
-  request = reqUnsecure POST (/: "log") body ignoreResponse mempty
+removeLogRequest :: (MonadReader AppConfig m, MonadIO m) => LogFilters -> m ()
+removeLogRequest lf@LogFilters { fid, interval } =
+  dateOrDefault lf >>= postLog . makeBody >> pure ()
+  where makeBody d = RemoveLogDto fid (formatted d) (def interval)
 
+undoLogRequest
+  :: (MonadReader AppConfig m, MonadIO m) => LogFilters -> Int -> m ()
+undoLogRequest lf@LogFilters { fid, interval } times =
+  dateOrDefault lf >>= postLog . makeBody >> pure ()
+  where makeBody d = UndoLogDto fid (formatted d) (def interval) times
+
+updateLogRequest
+  :: (MonadReader AppConfig m, MonadIO m) => LogFilters -> Amount -> m ()
+updateLogRequest lf@LogFilters { fid, interval } amount =
+  dateOrDefault lf >>= postLog . makeBody >> pure ()
+  where makeBody d = ModifyLogDto fid amount (formatted d) (def interval)

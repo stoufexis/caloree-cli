@@ -27,6 +27,9 @@ library
   exposed-modules:
       Dto.AddLog
       Dto.CustomFoodDto
+      Dto.RemoveLog
+      Dto.UndoLog
+      Dto.UpdateLog
       Http.Common
       Http.CustomFoodRequest
       Http.FoodRequest
