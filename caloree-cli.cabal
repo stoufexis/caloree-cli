@@ -46,6 +46,8 @@ library
       Model.Nutrients
       Model.Types
       Model.User
+      Parse.Common
+      Parse.Food
       ParseCommand
       Typeclass.AsQueryParam
       Typeclass.Formatted

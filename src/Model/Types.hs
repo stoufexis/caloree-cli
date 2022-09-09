@@ -5,7 +5,8 @@ module Model.Types
   , Id(..)
   , Description(..)
   , trimmed
-  , PageLimit(..)
+  , Page(..)
+  , Limit(..)
   , EFID(..)
   ) where
 import           Control.Applicative
@@ -19,19 +20,16 @@ import           Typeclass.AsQueryParam         ( AsQueryParam(..) )
 import           Typeclass.Formatted            ( Formatted(..) )
 import           Typeclass.WithDefault          ( WithDefault(..) )
 
-data Verbosity = Minimal | Normal | Verbose
+data Verbosity = Minimal | Normal | Verbose deriving Enum
 
 newtype Amount      = Amount Integer
 newtype Id          = Id Integer
 newtype Description = Description Text
+newtype Page        = Page Integer
+newtype Limit       = Limit Integer
 
 -- Either custom_food_id food_id
 newtype EFID = EFID (Either Id Id) deriving (Show)
-
-data PageLimit = PageLimit
-  { page  :: Integer
-  , limit :: Integer
-  }
 
 trimmed :: Verbosity -> Description -> Text
 trimmed Minimal (Description d) = T.take 50 d
@@ -58,11 +56,17 @@ instance AsQueryParam Description where
 instance AsQueryParam Amount where
   qparam (Amount a) = "amount" =: a
 
-instance AsQueryParam PageLimit where
-  qparam (PageLimit { page, limit }) = "page" =: page <> "limit" =: limit
+instance AsQueryParam Page where
+  qparam (Page page) = "page" =: page
 
-instance WithDefault PageLimit where
-  withDefault = PageLimit { page = 0, limit = 25 }
+instance AsQueryParam Limit where
+  qparam (Limit limit) = "limit" =: limit
+
+instance WithDefault Page where
+  withDefault = Page 0
+
+instance WithDefault Limit where
+  withDefault = Limit 25
 
 instance WithDefault Verbosity where
   withDefault = Normal
@@ -74,13 +78,15 @@ deriving instance Show Verbosity
 deriving instance Show Amount
 deriving instance Show Id
 deriving instance Show Description
-deriving instance Show PageLimit
+deriving instance Show Page
+deriving instance Show Limit
 
 deriving instance Generic Verbosity
 deriving instance Generic Amount
 deriving instance Generic Id
 deriving instance Generic Description
-deriving instance Generic PageLimit
+deriving instance Generic Page
+deriving instance Generic Limit
 
 instance ToJSON EFID where
   toJSON (EFID (Left  i)) = object ["custom_food_id" .= i]
@@ -93,7 +99,8 @@ instance ToJSON Verbosity
 instance ToJSON Amount
 instance ToJSON Id
 instance ToJSON Description
-instance ToJSON PageLimit
+instance ToJSON Page
+instance ToJSON Limit
 
 instance FromJSON EFID where
   parseJSON v = i v <|> i' v
@@ -105,4 +112,5 @@ instance FromJSON Verbosity
 instance FromJSON Amount
 instance FromJSON Id
 instance FromJSON Description
-instance FromJSON PageLimit
+instance FromJSON Page
+instance FromJSON Limit

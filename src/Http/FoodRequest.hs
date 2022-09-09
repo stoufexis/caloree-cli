@@ -16,7 +16,8 @@ import           Model.Types                    ( Amount
                                                 , Description(..)
                                                 , EFID(EFID)
                                                 , Id(Id)
-                                                , PageLimit(..)
+                                                , Limit(..)
+                                                , Page(..)
                                                 )
 import           Network.HTTP.Req
 import           Typeclass.AsQueryParam         ( AsQueryParam(qparam) )
@@ -30,9 +31,10 @@ baseGetFood params =
 getFoods
   :: (MonadReader AppConfig m, MonadIO m)
   => Description
-  -> Maybe PageLimit
+  -> Maybe Page
+  -> Maybe Limit
   -> m [FoodPreview]
-getFoods d pl = baseGetFood $ qparam d <> qparam (def pl)
+getFoods d p l = baseGetFood $ qparam d <> qparam (def p) <> qparam (def l)
 
 
 getFood

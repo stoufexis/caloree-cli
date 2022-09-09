@@ -14,28 +14,30 @@ import           Dto.AddLog                     ( AddLogDto(..) )
 import           Dto.RemoveLog                  ( RemoveLogDto(..) )
 import           Dto.UndoLog                    ( UndoLogDto(UndoLogDto) )
 import           Dto.UpdateLog                  ( ModifyLogDto(ModifyLogDto) )
+import           Fmt                            ( pretty )
 import           Http.Common                    ( reqUnsecure )
 import           Model.Command                  ( LogFilters(..)
                                                 , dateOrDefault
                                                 )
 import           Model.Config
+import           Model.DateTime
 import           Model.Log                      ( Log )
 import           Model.Types                    ( Amount
                                                 , EFID
-                                                , PageLimit(..)
+                                                , Limit(..)
+                                                , Page(..)
                                                 )
 import           Network.HTTP.Req
 import           Typeclass.AsQueryParam         ( AsQueryParam(qparam) )
 import           Typeclass.WithDefault          ( def )
-import Model.DateTime
-import Fmt (pretty)
 
 getLogsRequest
   :: (MonadReader AppConfig m, MonadIO m)
-  => Maybe PageLimit
+  => Maybe Page
+  -> Maybe Limit
   -> LogFilters
   -> m [Log]
-getLogsRequest pl fs = fmap responseBody request
+getLogsRequest p l fs = fmap responseBody request
  where
   request =
     dateOrDefault fs
@@ -43,8 +45,12 @@ getLogsRequest pl fs = fmap responseBody request
       .   makeParams
 
   makeParams x =
-    qparam x <> idParam fs <> intervalParam fs <> qparam (def pl) <> qparam
-      (Offset 0)
+    qparam x
+      <> idParam fs
+      <> intervalParam fs
+      <> qparam (def p)
+      <> qparam (def l)
+      <> qparam (Offset 0)
 
   idParam LogFilters { fid = Just i } = qparam i
   idParam _                           = mempty
@@ -63,7 +69,8 @@ addLogRequest
   -> EFID
   -> m ()
 addLogRequest amount date time fid = postLog body >> pure ()
-  where body = AddLogDto fid amount (pretty $ formatted date) (timeToMinutes time)
+ where
+  body = AddLogDto fid amount (pretty $ formatted date) (timeToMinutes time)
 
 removeLogRequest :: (MonadReader AppConfig m, MonadIO m) => LogFilters -> m ()
 removeLogRequest lf@LogFilters { fid, interval } =
@@ -80,4 +87,5 @@ updateLogRequest
   :: (MonadReader AppConfig m, MonadIO m) => LogFilters -> Amount -> m ()
 updateLogRequest lf@LogFilters { fid, interval } amount =
   dateOrDefault lf >>= postLog . makeBody >> pure ()
-  where makeBody d = ModifyLogDto fid amount (pretty $ formatted d) (def interval)
+ where
+  makeBody d = ModifyLogDto fid amount (pretty $ formatted d) (def interval)

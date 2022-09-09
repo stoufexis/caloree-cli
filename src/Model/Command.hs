@@ -5,11 +5,11 @@ module Model.Command
   , LogFilters(..)
   , dateOrDefault
   ) where
+import           Control.Monad.RWS              ( MonadReader(ask) )
+import           Model.Config                   ( AppConfig(..) )
+import           Model.DateTime
 import           Model.Nutrients
 import           Model.Types
-import Control.Monad.RWS (MonadReader (ask))
-import Model.Config (AppConfig(..))
-import Model.DateTime
 
 data LogFilters = LogFilters
   { interval :: Maybe Inteval
@@ -25,10 +25,10 @@ data Command = AddLog Amount Date Time EFID
              | UpdateLog LogFilters Amount
              | RemoveLog LogFilters
              | UndoLog LogFilters Int
-             | ViewLog (Maybe Verbosity) LogFilters (Maybe PageLimit)
-             | SearchFood (Maybe Verbosity) Description (Maybe PageLimit)
+             | ViewLog (Maybe Verbosity) LogFilters (Maybe Page) (Maybe Limit)
+             | SearchFood (Maybe Verbosity) Description (Maybe Page) (Maybe Limit)
              | ViewFood (Maybe Verbosity) Id (Maybe Amount)
-             | SearchCustomFood (Maybe Verbosity) Description (Maybe PageLimit)
+             | SearchCustomFood (Maybe Verbosity) Description (Maybe Page) (Maybe Limit)
              | ViewCustomFood (Maybe Verbosity) Id (Maybe Amount)
              | AddCustomFood Description Nutrients
              | DeleteCustomFood Id

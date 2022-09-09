@@ -22,12 +22,13 @@ import           Typeclass.WithDefault          ( def )
 getCustomFoods
   :: (MonadReader AppConfig m, MonadIO m)
   => Description
-  -> Maybe PageLimit
+  -> Maybe Page
+  -> Maybe Limit
   -> m [CustomFoodPreview]
-getCustomFoods d pl = fmap responseBody request
+getCustomFoods d p l = fmap responseBody request
  where
   request = reqUnsecure GET (/: "custom-food") NoReqBody jsonResponse params
-  params  = qparam d <> qparam (def pl)
+  params  = qparam d <> qparam (def p) <> qparam (def l)
 
 getCustomFood
   :: (MonadReader AppConfig m, MonadIO m)

@@ -3,10 +3,10 @@ module Dto.UpdateLog
   ) where
 import           Data.Aeson.Types
 import           Data.Text                      ( Text )
+import           Model.DateTime                 ( Inteval )
 import           Model.Types                    ( Amount
                                                 , EFID
                                                 )
-import Model.DateTime (Inteval)
 
 data ModifyLogDto = ModifyLogDto
   { fid       :: Maybe EFID
