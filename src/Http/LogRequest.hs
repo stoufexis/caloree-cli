@@ -28,6 +28,7 @@ import           Network.HTTP.Req
 import           Typeclass.AsQueryParam         ( AsQueryParam(qparam) )
 import           Typeclass.WithDefault          ( def )
 import Model.DateTime
+import Fmt (pretty)
 
 getLogsRequest
   :: (MonadReader AppConfig m, MonadIO m)
@@ -62,21 +63,21 @@ addLogRequest
   -> EFID
   -> m ()
 addLogRequest amount date time fid = postLog body >> pure ()
-  where body = AddLogDto fid amount (formatted date) (timeToMinutes time)
+  where body = AddLogDto fid amount (pretty $ formatted date) (timeToMinutes time)
 
 removeLogRequest :: (MonadReader AppConfig m, MonadIO m) => LogFilters -> m ()
 removeLogRequest lf@LogFilters { fid, interval } =
   dateOrDefault lf >>= postLog . makeBody >> pure ()
-  where makeBody d = RemoveLogDto fid (formatted d) (def interval)
+  where makeBody d = RemoveLogDto fid (pretty $ formatted d) (def interval)
 
 undoLogRequest
   :: (MonadReader AppConfig m, MonadIO m) => LogFilters -> Int -> m ()
 undoLogRequest lf@LogFilters { fid, interval } times =
   dateOrDefault lf >>= postLog . makeBody >> pure ()
-  where makeBody d = UndoLogDto fid (formatted d) (def interval) times
+  where makeBody d = UndoLogDto fid (pretty $ formatted d) (def interval) times
 
 updateLogRequest
   :: (MonadReader AppConfig m, MonadIO m) => LogFilters -> Amount -> m ()
 updateLogRequest lf@LogFilters { fid, interval } amount =
   dateOrDefault lf >>= postLog . makeBody >> pure ()
-  where makeBody d = ModifyLogDto fid amount (formatted d) (def interval)
+  where makeBody d = ModifyLogDto fid amount (pretty $ formatted d) (def interval)

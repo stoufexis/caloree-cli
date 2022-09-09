@@ -10,6 +10,7 @@ import qualified Data.Vector                   as V
 import           Data.Vector                    ( indexed )
 import           Fmt
 import           GHC.Generics
+import           Model.DateTime                 ( formatted )
 import           Model.Types
 import           Typeclass.Tabled
 
@@ -25,21 +26,21 @@ instance FromJSON FoodPreview
 instance Tabled FoodPreview where
   colonnade Minimal = mconcat
     [ headed "#" (pretty . fst)
-    , headed "id" $ pretty . (\(Id x) -> x) . Model.FoodPreview.id . snd
+    , headed "id" $ pretty . formatted . Model.FoodPreview.id . snd
     ]
 
   colonnade Normal = mconcat
     [ headed "#" (pretty . fst)
-    , headed "id" $ pretty . (\(Id x) -> x) . Model.FoodPreview.id . snd
+    , headed "id" $ pretty . formatted . Model.FoodPreview.id . snd
     , headed "description" (pretty . trimmed Normal . description . snd)
     ]
 
   colonnade Verbose = mconcat
     [ headed "#" (pretty . fst)
-    , headed "id" $ pretty . (\(Id x) -> x) . Model.FoodPreview.id . snd
+    , headed "id" $ pretty . formatted . Model.FoodPreview.id . snd
     , headed "description" (pretty . trimmed Verbose . description . snd)
     ]
 
-  table Minimal = pretty . (\(Id x) -> x) . Model.FoodPreview.id . V.head
+  table Minimal = pretty . formatted . Model.FoodPreview.id . V.head
   table v       = ascii (colonnade v) . indexed
 

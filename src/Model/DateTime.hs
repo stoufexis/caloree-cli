@@ -9,6 +9,7 @@ module Model.DateTime
   , formatted
   , timeToMinutes
   , toRange
+  , minutesToTime
   ) where
 import           Data.Aeson
 import           Data.Text                      ( Text )
@@ -16,6 +17,7 @@ import           Fmt
 import           GHC.Generics
 import           Network.HTTP.Req
 import           Typeclass.AsQueryParam
+import           Typeclass.Formatted
 import           Typeclass.WithDefault
 
 -- year month day
@@ -46,17 +48,27 @@ toRange (Inteval (grouping, group, offset)) =
       end        = start + m
   in  (start, end)
 
-formatted :: Date -> Text
-formatted (Date { year, month, day }) =
-  "" +| year |+ "-" +| m |+ "-" +| d |+ ""
- where
-  m :: Text
-  m = if month < 10 then "0" +| month |+ "" else pretty month
-  d :: Text
-  d = if day < 10 then "0" +| day |+ "" else pretty day
-
 timeToMinutes :: Time -> Minute
 timeToMinutes Time { hour, minute } = Minute $ hour * 60 + minute
+
+minutesToTime :: Minute -> Time
+minutesToTime (Minute m) = Time (m `div` 60) (m `mod` 60)
+
+instance Formatted Date where
+  formatted (Date { year, month, day }) =
+    "" +| year |+ "-" +| m |+ "-" +| d |+ ""
+   where
+    m :: Text
+    m = if month < 10 then "0" +| month |+ "" else pretty month
+    d :: Text
+    d = if day < 10 then "0" +| day |+ "" else pretty day
+
+instance Formatted Time where
+  formatted Time { hour, minute } = hour |+ ":" +| minute |+ ""
+
+instance Formatted Inteval where
+  formatted i =
+    let (start, end) = toRange i in "" +| start |+ "-" +| end |+ ""
 
 instance AsQueryParam Inteval where
   qparam i =
@@ -67,7 +79,7 @@ instance AsQueryParam Offset where
   qparam (Offset o) = "offset" =: o
 
 instance AsQueryParam Date where
-  qparam d = "date" =: formatted d
+  qparam d = "date" =: ((pretty $ formatted d) :: String)
 
 instance WithDefault Inteval where
   withDefault = Inteval (Just withDefault, Just withDefault, Just withDefault)
@@ -81,6 +93,13 @@ instance WithDefault Minute where
 instance WithDefault Offset where
   withDefault = Offset 0
 
+instance ToJSON Inteval where
+  toJSON i =
+    let (start, end) = toRange i in object ["start" .= start, "end" .= end]
+
+  toEncoding i =
+    let (start, end) = toRange i in pairs ("start" .= start <> "end" .= end)
+
 deriving instance Show Inteval
 deriving instance Show Group
 deriving instance Show Minute
@@ -93,13 +112,6 @@ deriving instance Generic Minute
 deriving instance Generic Offset
 deriving instance Generic Time
 deriving instance Generic Date
-
-instance ToJSON Inteval where
-  toJSON i =
-    let (start, end) = toRange i in object ["start" .= start, "end" .= end]
-
-  toEncoding i =
-    let (start, end) = toRange i in pairs ("start" .= start <> "end" .= end)
 
 instance ToJSON Group
 instance ToJSON Minute

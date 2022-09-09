@@ -10,16 +10,14 @@ import           Data.Profunctor                ( Profunctor(lmap) )
 import           Data.Text                      ( Text )
 import           Fmt
 import           GHC.Generics                   ( Generic )
-import           Model.Nutrients
-import           Model.Types                    ( Amount(Amount)
-                                                , Description
-                                                , EFID(EFID)
-                                                , Id(Id)
-                                                , Verbosity(..)
-                                                , trimmed
+import           Model.DateTime                 ( Minute(..)
+                                                , minutesToTime
                                                 )
+
+import           Model.Nutrients
+import           Model.Types
+import           Typeclass.Formatted
 import           Typeclass.Tabled               ( Tabled(..) )
-import Model.DateTime (Minute (Minute))
 
 data Log = Log
   { id          :: EFID
@@ -37,19 +35,14 @@ instance FromJSON Log
 instance Tabled Log where
   colonnade v = mconcat
     [ headed "#" $ pretty . fst
-    , headed "id" $ pretty . idcol . Model.Log.id . snd
+    , headed "id" $ pretty . formatted . Model.Log.id . snd
     , headed "description" $ pretty . trimmed v . description . snd
-    , headed "time" $ time . minute . snd
-    , headed "amount" $ (\(Amount a) -> a |+ " gr") . amount . snd
+    , headed "time" $ pretty . formatted . minutesToTime . minute . snd
+    , headed "amount" $ pretty . formatted . amount . snd
     , case v of
       Verbose -> ncol
       Normal  -> ncol
       Minimal -> mempty
     ]
-   where
-    time (Minute m) = "" +| m `div` 60 |+ ":" +| m `mod` 60 |+ ""
-    ncol = lmap (second nutrients) $ colonnade v
-
-    idcol (EFID (Left  (Id i))) = i
-    idcol (EFID (Right (Id i))) = i
+    where ncol = lmap (second nutrients) $ colonnade v
 

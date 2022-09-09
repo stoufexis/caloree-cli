@@ -12,9 +12,11 @@ import           Control.Applicative
 import           Data.Aeson.Types
 import           Data.Text                      ( Text )
 import qualified Data.Text                     as T
+import           Fmt
 import           GHC.Generics                   ( Generic )
 import           Network.HTTP.Req
 import           Typeclass.AsQueryParam         ( AsQueryParam(..) )
+import           Typeclass.Formatted            ( Formatted(..) )
 import           Typeclass.WithDefault          ( WithDefault(..) )
 
 data Verbosity = Minimal | Normal | Verbose
@@ -35,6 +37,16 @@ trimmed :: Verbosity -> Description -> Text
 trimmed Minimal (Description d) = T.take 50 d
 trimmed Normal  (Description d) = T.take 100 d
 trimmed Verbose (Description d) = d
+
+instance Formatted Amount where
+  formatted (Amount a) = a |+ " gr"
+
+instance Formatted Id where
+  formatted (Id a) = build a
+
+instance Formatted EFID where
+  formatted (EFID (Left  (Id i))) = "*" +| i |+ ""
+  formatted (EFID (Right (Id i))) = build i
 
 instance AsQueryParam EFID where
   qparam (EFID (Right (Id i))) = "food_id" =: i
@@ -86,10 +98,7 @@ instance ToJSON PageLimit
 instance FromJSON EFID where
   parseJSON v = i v <|> i' v
    where
-    i :: Value -> Parser EFID
-    i = fmap (EFID . Left) . withObject "EFID" (.: "custom_food_id")
-
-    i' :: Value -> Parser EFID
+    i  = fmap (EFID . Left) . withObject "EFID" (.: "custom_food_id")
     i' = fmap (EFID . Right) . withObject "EFID" (.: "food_id")
 
 instance FromJSON Verbosity

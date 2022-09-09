@@ -48,6 +48,7 @@ library
       Model.User
       ParseCommand
       Typeclass.AsQueryParam
+      Typeclass.Formatted
       Typeclass.Tabled
       Typeclass.WithDefault
   other-modules:
