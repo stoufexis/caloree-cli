@@ -8,6 +8,8 @@ module Parse.Common
   , descriptionOption
   , pageOption
   , limitOption
+  , idFoodViewOption
+  , viewFoodAmountOption
   ) where
 import qualified Data.Text                     as T
 import           Model.Types
@@ -23,6 +25,9 @@ readMDesc = eitherReader (Right . Description . T.pack)
 
 readMEnum :: Enum a => ReadM (Maybe a)
 readMEnum = fmap (fmap toEnum) (readMMaybe id)
+
+readMId :: ReadM Id
+readMId = eitherReader (fmap Id . readEither)
 
 verbosityOption :: Parser (Maybe Verbosity)
 verbosityOption = option
@@ -57,6 +62,21 @@ limitOption = option
   <> short 'l'
   <> metavar "LIMIT"
   <> help "Limit results to"
+  <> value Nothing
+  )
+
+idFoodViewOption :: Parser Id
+idFoodViewOption = option
+  readMId
+  (long "id" <> short 'i' <> metavar "ID" <> help "Id of the food to be viewed")
+
+viewFoodAmountOption :: Parser (Maybe Amount)
+viewFoodAmountOption = option
+  (readMMaybe Amount)
+  (  long "amount"
+  <> short 'a'
+  <> metavar "AMOUNT"
+  <> help "Nutrients of Food per this amount"
   <> value Nothing
   )
 

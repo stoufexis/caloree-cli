@@ -6,6 +6,7 @@ import           Model.Types                    ( Description(Description) )
 import           Options.Applicative            ( execParser )
 import           Options.Applicative.Builder
 import           Text.Read                      ( readEither )
+import Parse.Food (parseFoodCommands)
 
 maybeOpt :: Read a => ReadM (Maybe a)
 maybeOpt = eitherReader $ \x -> fmap Just (readEither x)
@@ -35,7 +36,7 @@ searchFoodCommand = command "search"
     )
 
 app :: IO ()
-app = execParser (info (subparser searchFoodCommand) mempty) >>= print
+app = execParser parseFoodCommands >>= print
 -- appp :: IO ()
 -- appp = execParser (info aa mempty) >>= print
 --  where

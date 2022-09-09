@@ -33,6 +33,8 @@ data Command = AddLog Amount Date Time EFID
              | AddCustomFood Description Nutrients
              | DeleteCustomFood Id
 
+deriving instance Show LogFilters
+deriving instance Show Command
 
 --  log
 --    - add    --amount <grams> --day <date> --time <time>  <food_id>
