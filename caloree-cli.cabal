@@ -45,6 +45,7 @@ library
       ParseCommand
       Typeclass.AsQueryParam
       Typeclass.Tabled
+      Typeclass.WithDefault
   other-modules:
       Paths_caloree_cli
   hs-source-dirs:

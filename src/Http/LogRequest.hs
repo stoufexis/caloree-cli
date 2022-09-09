@@ -21,14 +21,16 @@ import           Model.Types                    ( Amount
                                                 , Offset(Offset)
                                                 , PageLimit(..)
                                                 , Time(..)
+                                                , formatted
+                                                , timeToMinutes
                                                 )
 import           Network.HTTP.Req
 import           Typeclass.AsQueryParam         ( AsQueryParam(qparam) )
 import           Typeclass.WithDefault          ( def )
 
 getLogsRequest
-  :: (MonadReader AppConfig m, MonadIO m) => (PageLimit, LogFilters) -> m [Log]
-getLogsRequest (pl, fs) = fmap responseBody request
+  :: (MonadReader AppConfig m, MonadIO m) => PageLimit -> LogFilters -> m [Log]
+getLogsRequest pl fs = fmap responseBody request
  where
   request = params >>= reqUnsecure GET path NoReqBody jsonResponse
 
@@ -48,19 +50,18 @@ getLogsRequest (pl, fs) = fmap responseBody request
   filtersParam (LogFilters { interval }) = qparam $ def interval
 
 addLogRequest
-  :: (MonadReader AppConfig m, MonadIO m) => (Amount, Date, Time, EFID) -> m ()
-addLogRequest (a, Date { year, month, day }, Time { hour, minute }, i) =
-  request >> pure ()
+  :: (MonadReader AppConfig m, MonadIO m)
+  => Amount
+  -> Date
+  -> Time
+  -> EFID
+  -> m ()
+addLogRequest a d t i = request >> pure ()
  where
-  m :: Text
-  m = if month < 10 then "0" +| month |+ "" else pretty month
-  d :: Text
-  d    = if day < 10 then "0" +| day |+ "" else pretty day
-
   body = ReqBodyJson AddLogDto { fid    = i
                                , amount = a
-                               , day = "" +| year |+ "-" +| m |+ "-" +| d |+ ""
-                               , minute = Minute (hour * 60 + minute)
+                               , day    = formatted d
+                               , minute = timeToMinutes t
                                }
 
   request = reqUnsecure POST (/: "log") body ignoreResponse mempty

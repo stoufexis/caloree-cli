@@ -14,16 +14,16 @@ data LogFilters = LogFilters
   , cfid     :: Maybe Id
   }
 
-data Command = AddLog (Amount, Date, Time, EFID)
-             | UpdateLog (LogFilters, Amount)
+data Command = AddLog Amount Date Time EFID
+             | UpdateLog LogFilters Amount
              | DeleteLog LogFilters
              | UndoLog LogFilters
-             | ViewLog (Maybe Verbosity, LogFilters, Maybe PageLimit)
-             | SearchFood (Maybe Verbosity, Description, Maybe PageLimit )
-             | ViewFood (Maybe Verbosity, Id, Maybe Amount)
-             | SearchCustomFood (Maybe Verbosity, Description, Maybe PageLimit )
-             | ViewCustomFood (Maybe Verbosity, Id, Maybe Amount )
-             | AddCustomFood (Description, Nutrients)
+             | ViewLog ( Maybe Verbosity ) LogFilters ( Maybe PageLimit )
+             | SearchFood ( Maybe Verbosity ) Description ( Maybe PageLimit )
+             | ViewFood ( Maybe Verbosity ) Id ( Maybe Amount )
+             | SearchCustomFood ( Maybe Verbosity ) Description ( Maybe PageLimit )
+             | ViewCustomFood ( Maybe Verbosity ) Id ( Maybe Amount )
+             | AddCustomFood Description Nutrients
              | DeleteCustomFood Id
 
 

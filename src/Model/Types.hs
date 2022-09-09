@@ -13,6 +13,8 @@ module Model.Types
   , Group(..)
   , Inteval(..)
   , EFID(..)
+  , formatted
+  , timeToMinutes
   ) where
 import           Control.Applicative
 import           Data.Aeson.Types
@@ -64,11 +66,24 @@ data Date = Date
   , day   :: Integer
   }
 
+formatted :: Date -> Text
+formatted (Date { year, month, day }) =
+  "" +| year |+ "-" +| m |+ "-" +| d |+ ""
+ where
+  m :: Text
+  m = if month < 10 then "0" +| month |+ "" else pretty month
+  d :: Text
+  d = if day < 10 then "0" +| day |+ "" else pretty day
+
+
 -- hour minute
 data Time = Time
   { hour   :: Integer
   , minute :: Integer
   }
+
+timeToMinutes :: Time -> Minute
+timeToMinutes Time { hour, minute } = Minute $ hour * 60 + minute
 
 data PageLimit = PageLimit
   { page  :: Integer
@@ -89,20 +104,21 @@ instance AsQueryParam Inteval where
         end        = start + m
     in  "interval" =: (("" +| start |+ "-" +| end |+ "") :: String)
 
+instance AsQueryParam Description where
+  qparam (Description d) = "description" =: d
+
 instance AsQueryParam Offset where
   qparam (Offset o) = "offset" =: o
+
+instance AsQueryParam Amount where
+  qparam (Amount a) = "amount" =: a
 
 instance AsQueryParam PageLimit where
   qparam (PageLimit { page, limit }) = "page" =: page <> "limit" =: limit
 
 instance AsQueryParam Date where
-  qparam (Date { year, month, day }) =
-    "date" =: (("" +| year |+ "-" +| m |+ "-" +| d |+ "") :: String)
-   where
-    m :: Text
-    m = if month < 10 then "0" +| month |+ "" else pretty month
-    d :: Text
-    d = if day < 10 then "0" +| day |+ "" else pretty day
+  qparam d = "date" =: formatted d
+
 
 instance WithDefault Inteval where
   withDefault = Inteval (Just withDefault, Just withDefault, Just withDefault)

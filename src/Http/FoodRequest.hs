@@ -18,6 +18,7 @@ import           Model.Types                    ( Amount(Amount)
                                                 , PageLimit(..)
                                                 )
 import           Network.HTTP.Req
+import           Typeclass.AsQueryParam         ( AsQueryParam(qparam) )
 
 baseGetFood
   :: (FromJSON b, MonadIO f, MonadReader AppConfig f) => Option 'Http -> f b
@@ -26,14 +27,14 @@ baseGetFood params =
 
 getFoods
   :: (MonadReader AppConfig m, MonadIO m)
-  => (Description, PageLimit)
+  => Description
+  -> PageLimit
   -> m [FoodPreview]
-getFoods (Description d, PageLimit { page = p, limit = l }) =
-  baseGetFood $ "description" =: d <> "page" =: p <> "limit" =: l
+getFoods d pl = baseGetFood $ qparam d <> qparam pl
 
 
-getFood :: (MonadReader AppConfig m, MonadIO m) => (Id, Amount) -> m [Food]
-getFood (Id i, Amount amount) =
-  fmap pure $ baseGetFood $ "food_id" =: i <> "amount" =: amount
+getFood :: (MonadReader AppConfig m, MonadIO m) => Id -> Amount -> m [Food]
+getFood (Id i) a =
+  fmap pure $ baseGetFood $ "food_id" =: i <> qparam a
 
 
