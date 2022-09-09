@@ -21,17 +21,13 @@ import           Model.Command                  ( LogFilters(..)
 import           Model.Config
 import           Model.Log                      ( Log )
 import           Model.Types                    ( Amount
-                                                , Date(..)
                                                 , EFID
-                                                , Offset(Offset)
                                                 , PageLimit(..)
-                                                , Time(..)
-                                                , formatted
-                                                , timeToMinutes
                                                 )
 import           Network.HTTP.Req
 import           Typeclass.AsQueryParam         ( AsQueryParam(qparam) )
 import           Typeclass.WithDefault          ( def )
+import Model.DateTime
 
 getLogsRequest
   :: (MonadReader AppConfig m, MonadIO m)

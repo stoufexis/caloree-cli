@@ -4,6 +4,7 @@ module Dto.AddLog
 import           Data.Aeson.Types
 import           Data.Text                      ( Text )
 import           Model.Types
+import Model.DateTime
 
 data AddLogDto = AddLogDto
   { fid    :: EFID

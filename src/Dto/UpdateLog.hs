@@ -5,8 +5,8 @@ import           Data.Aeson.Types
 import           Data.Text                      ( Text )
 import           Model.Types                    ( Amount
                                                 , EFID
-                                                , Inteval
                                                 )
+import Model.DateTime (Inteval)
 
 data ModifyLogDto = ModifyLogDto
   { fid       :: Maybe EFID

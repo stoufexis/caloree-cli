@@ -9,6 +9,7 @@ import           Model.Nutrients
 import           Model.Types
 import Control.Monad.RWS (MonadReader (ask))
 import Model.Config (AppConfig(..))
+import Model.DateTime
 
 data LogFilters = LogFilters
   { interval :: Maybe Inteval

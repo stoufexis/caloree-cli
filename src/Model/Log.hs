@@ -15,11 +15,11 @@ import           Model.Types                    ( Amount(Amount)
                                                 , Description
                                                 , EFID(EFID)
                                                 , Id(Id)
-                                                , Minute(Minute)
                                                 , Verbosity(..)
                                                 , trimmed
                                                 )
 import           Typeclass.Tabled               ( Tabled(..) )
+import Model.DateTime (Minute (Minute))
 
 data Log = Log
   { id          :: EFID

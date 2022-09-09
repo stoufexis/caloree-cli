@@ -4,7 +4,7 @@ module Model.Config
   ) where
 import           Data.ByteString                ( ByteString )
 import           Data.Text                      ( Text )
-import           Model.Types                    ( Date )
+import           Model.DateTime                 ( Date )
 
 data AppConfig = AppConfig
   { host     :: Text

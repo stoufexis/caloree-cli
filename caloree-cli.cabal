@@ -39,6 +39,7 @@ library
       Model.Config
       Model.CustomFood
       Model.CustomFoodPreview
+      Model.DateTime
       Model.Food
       Model.FoodPreview
       Model.Log

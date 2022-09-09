@@ -3,9 +3,8 @@ module Dto.RemoveLog
   ) where
 import           Data.Aeson.Types
 import           Data.Text                      ( Text )
-import           Model.Types                    ( EFID
-                                                , Inteval
-                                                )
+import           Model.DateTime
+import           Model.Types                    ( EFID )
 
 data RemoveLogDto = RemoveLogDto
   { fid    :: Maybe EFID
