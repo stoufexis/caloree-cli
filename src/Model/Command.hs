@@ -21,7 +21,7 @@ dateOrDefault :: MonadReader AppConfig m => LogFilters -> m Date
 dateOrDefault (LogFilters { date = Just d }) = pure d
 dateOrDefault _ = fmap (\(AppConfig { date = d }) -> d) ask
 
-data Command = AddLog Amount Date Time EFID
+data Command = AddLog Amount (Maybe Date) (Maybe Time) EFID
              | UpdateLog LogFilters Amount
              | RemoveLog LogFilters
              | UndoLog LogFilters Int
@@ -38,10 +38,10 @@ deriving instance Show Command
 
 --  log
 --    - add    --amount <grams> --day <date> --time <time>  <food_id>
---    - update --grouping <minutes> --day <date> --group <int> --fid <food_id> --amount <int> 
---    - delete --grouping <minutes> --day <date> --group <int> --fid <food_id> 
---    - undo   --grouping <minutes> --day <date> --group <int> --fid <food_id> 
---    - view   --verbosity 0-2 --grouping <minutes> --day <date> --group <int> --fid <food_id> --page <int> --limit <int>
+--    - update --window <minutes> --offset <offset> --day <date> --group <int> --fid <food_id> --cfid <custom_food_id> --amount <int> 
+--    - delete --window <minutes> --offset <offset> --day <date> --group <int> --fid <food_id> --cfid <custom_food_id>
+--    - undo   --window <minutes> --offset <offset> --day <date> --group <int> --fid <food_id> --cfid <custom_food_id> --times <int>
+--    - view   --verbosity 0-2 --window <minutes> --day <date> --group <int> --fid <food_id> --cfid <custom_food_id> --page <int> --limit <int>
 --  food 
 --    - search --verbosity 0-2 --description <string> --page <int> --limit <int>
 --    - view   --verbosity 0-2 --fid <food_id> --amount <grams>

@@ -39,11 +39,12 @@ viewFood = command
   commandDescription =
     fullDesc <> progDesc "View nutrients of food of a specific amount"
 
-parseFoodCommands :: ParserInfo Command
-parseFoodCommands = info (subparser (searchFood <> viewFood))
-                         commandDescription
+parseFoodCommands :: Mod CommandFields Command
+parseFoodCommands = command "food"
+  $ info (hsubparser (searchFood <> viewFood)) commandDescription
  where
   commandDescription =
-    fullDesc <> progDesc "Commands for searching and viewing foods"
+    fullDesc <> progDesc "Commands for searching and viewing foods" <> header
+      "Search foods"
 
 

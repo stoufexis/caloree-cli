@@ -47,8 +47,10 @@ library
       Model.Types
       Model.User
       Parse.Common
+      Parse.CustomFood
       Parse.Food
-      ParseCommand
+      Parse.Log
+      Parse.ParseCommand
       Typeclass.AsQueryParam
       Typeclass.Formatted
       Typeclass.Tabled

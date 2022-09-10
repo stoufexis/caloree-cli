@@ -10,8 +10,22 @@ module Parse.Common
   , limitOption
   , idFoodViewOption
   , viewFoodAmountOption
+  , logFiltersOption
+  , addFoodAmountOption
+  , dateOption
+  , timeOption
+  , efidOptionMandatory
   ) where
 import qualified Data.Text                     as T
+import           Data.Text                      ( split )
+import           Model.Command                  ( LogFilters(LogFilters) )
+import           Model.DateTime                 ( Date(Date)
+                                                , Group(Group)
+                                                , Inteval(Inteval)
+                                                , Minute(Minute)
+                                                , Offset(Offset)
+                                                , Time(Time)
+                                                )
 import           Model.Types
 import           Options.Applicative
 import           Text.Read                      ( readEither )
@@ -66,9 +80,8 @@ limitOption = option
   )
 
 idFoodViewOption :: Parser Id
-idFoodViewOption = option
-  readMId
-  (long "id" <> short 'i' <> metavar "ID" <> help "Id of the food to be viewed")
+idFoodViewOption =
+  option readMId (long "id" <> short 'i' <> metavar "ID" <> help "Id of a food")
 
 viewFoodAmountOption :: Parser (Maybe Amount)
 viewFoodAmountOption = option
@@ -76,8 +89,117 @@ viewFoodAmountOption = option
   (  long "amount"
   <> short 'a'
   <> metavar "AMOUNT"
-  <> help "Nutrients of Food per this amount"
+  <> help "Nutrients of food per this amount"
   <> value Nothing
   )
 
+addFoodAmountOption :: Parser Amount
+addFoodAmountOption = option
+  (fmap Amount auto)
+  (long "amount" <> short 'a' <> metavar "AMOUNT" <> help "Amount of food")
+
+parseDate :: (Date -> a) -> ReadM a
+parseDate f = eitherReader (\x -> parse x $ split delimiters $ T.pack x)
+ where
+  parse x = \case
+    [y, m, d] ->
+      fmap f
+        $   Date
+        <$> readEither (T.unpack y)
+        <*> readEither (T.unpack m)
+        <*> readEither (T.unpack d)
+
+    _ -> Left x
+
+  delimiters = \case
+    '-' -> True
+    _   -> False
+
+parseTime :: (Time -> a) -> ReadM a
+parseTime f = eitherReader (\x -> parse x $ split delimiters $ T.pack x)
+ where
+  parse x = \case
+    [h, m] ->
+      fmap f $ Time <$> readEither (T.unpack h) <*> readEither (T.unpack m)
+
+    _ -> Left x
+
+  delimiters = \case
+    '-' -> True
+    _   -> False
+
+
+dateOption :: Parser (Maybe Date)
+dateOption = option
+  (parseDate Just)
+  (  long "day"
+  <> short 'd'
+  <> metavar "DAY"
+  <> help "Day in the form of `YYYY-MM-DD`"
+  <> value Nothing
+  )
+
+fidOptPartial :: Mod OptionFields a
+fidOptPartial = long "fid" <> metavar "FOOD_ID" <> help "Id referencing a food"
+
+cfidOptPartial :: Mod OptionFields a
+cfidOptPartial =
+  long "cfid" <> metavar "CUSTOM_FOOD_ID" <> help "Id referencing a custom food"
+
+efidOptionOptional :: Parser (Maybe EFID)
+efidOptionOptional = makeEfid <$> cfidOpt <*> fidOpt
+ where
+  makeEfid (Just cfid) _          = Just $ EFID $ Left cfid
+  makeEfid _           (Just fid) = Just $ EFID $ Right fid
+  makeEfid _           _          = Nothing
+
+  fidOpt  = option (readMMaybe Id) (fidOptPartial <> value Nothing)
+  cfidOpt = option (readMMaybe Id) (cfidOptPartial <> value Nothing)
+
+efidOptionMandatory :: Parser EFID
+efidOptionMandatory = fmap EFID $ cfidOpt <|> fidOpt
+ where
+  fidOpt  = option (fmap (Right . Id) auto) fidOptPartial
+  cfidOpt = option (fmap (Left . Id) auto) cfidOptPartial
+
+timeOption :: Parser (Maybe Time)
+timeOption = option
+  (parseTime Just)
+  (  long "day"
+  <> metavar "DAY"
+  <> help "Time in the form `HH:MM`"
+  <> value Nothing
+  )
+
+logFiltersOption :: Parser LogFilters
+logFiltersOption =
+  LogFilters <$> intervalOpt <*> dateOption <*> efidOptionOptional
+ where
+  intervalOpt = fmap Just $ Inteval <$> window <*> group <*> offset
+  window      = option
+    (readMMaybe Minute)
+    (  long "window"
+    <> short 'w'
+    <> metavar "WINDOW"
+    <> help "Window results by minutes"
+    <> value Nothing
+    )
+
+  group = option
+    (readMMaybe Group)
+    (  long "group"
+    <> short 'g'
+    <> metavar "GROUP"
+    <> help "Group of results to show"
+    <> value Nothing
+    )
+
+  offset = option
+    (readMMaybe Offset)
+    (  long "offset"
+    <> short 'o'
+    <> metavar "offset"
+    <> help "Offset results by this amount of minutes"
+    <> value Nothing
+    )
 

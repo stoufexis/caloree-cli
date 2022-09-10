@@ -62,15 +62,25 @@ postLog
 postLog b = reqUnsecure POST (/: "log") (ReqBodyJson b) ignoreResponse mempty
 
 addLogRequest
-  :: (MonadReader AppConfig m, MonadIO m)
+  :: forall m
+   . (MonadReader AppConfig m, MonadIO m)
   => Amount
-  -> Date
-  -> Time
+  -> Maybe Date
+  -> Maybe Time
   -> EFID
   -> m ()
-addLogRequest amount date time fid = postLog body >> pure ()
+addLogRequest amount date time fid = body >>= postLog >> pure ()
  where
-  body = AddLogDto fid amount (pretty $ formatted date) (timeToMinutes time)
+  body =
+    (\d t -> AddLogDto fid amount (pretty $ formatted d) (timeToMinutes t))
+      <$> dateDefault date
+      <*> timeDefault time
+
+  timeDefault (Just a) = pure a
+  timeDefault Nothing  = fmap (\AppConfig { time = t } -> t) ask
+
+  dateDefault (Just a) = pure a
+  dateDefault Nothing  = fmap (\AppConfig { date = d } -> d) ask
 
 removeLogRequest :: (MonadReader AppConfig m, MonadIO m) => LogFilters -> m ()
 removeLogRequest lf@LogFilters { fid, interval } =

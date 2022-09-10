@@ -37,10 +37,10 @@ newtype Minute = Minute Integer
 newtype Offset = Offset Integer
 newtype Group  = Group Integer
 
-newtype Inteval = Inteval (Maybe Minute, Maybe Group, Maybe Offset)
+data Inteval = Inteval (Maybe Minute) (Maybe Group) (Maybe Offset)
 
 toRange :: Inteval -> (Integer, Integer)
-toRange (Inteval (grouping, group, offset)) =
+toRange (Inteval grouping group offset) =
   let (Offset o) = def offset
       (Minute m) = def grouping
       (Group  g) = def group
@@ -82,7 +82,8 @@ instance AsQueryParam Date where
   qparam d = "date" =: ((pretty $ formatted d) :: String)
 
 instance WithDefault Inteval where
-  withDefault = Inteval (Just withDefault, Just withDefault, Just withDefault)
+  withDefault =
+    Inteval (Just withDefault) (Just withDefault) (Just withDefault)
 
 instance WithDefault Group where
   withDefault = Group 0

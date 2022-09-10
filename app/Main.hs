@@ -1,7 +1,7 @@
 module Main (main) where
 
 import Lib
-import ParseCommand (app)
+import Parse.ParseCommand (parseCommand)
 
 main :: IO ()
-main = app
+main = parseCommand

@@ -29,7 +29,7 @@ newtype Page        = Page Integer
 newtype Limit       = Limit Integer
 
 -- Either custom_food_id food_id
-newtype EFID = EFID (Either Id Id) deriving (Show)
+newtype EFID = EFID (Either Id Id) deriving Show
 
 trimmed :: Verbosity -> Description -> Text
 trimmed Minimal (Description d) = T.take 50 d

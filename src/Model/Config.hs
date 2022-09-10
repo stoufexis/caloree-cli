@@ -4,7 +4,9 @@ module Model.Config
   ) where
 import           Data.ByteString                ( ByteString )
 import           Data.Text                      ( Text )
-import           Model.DateTime                 ( Date )
+import           Model.DateTime                 ( Date
+                                                , Time
+                                                )
 
 data AppConfig = AppConfig
   { host     :: Text
@@ -12,4 +14,5 @@ data AppConfig = AppConfig
   , username :: ByteString
   , password :: ByteString
   , date     :: Date
+  , time     :: Time
   }
