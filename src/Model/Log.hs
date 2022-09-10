@@ -14,6 +14,8 @@ import           Model.DateTime                 ( Minute(..)
                                                 , minutesToTime
                                                 )
 
+import           Data.Vector                    ( indexed )
+import qualified Data.Vector                   as V
 import           Model.Nutrients
 import           Model.Types
 import           Typeclass.Formatted
@@ -35,14 +37,20 @@ instance FromJSON Log
 instance Tabled Log where
   colonnade v = mconcat
     [ headed "#" $ pretty . fst
-    , headed "id" $ pretty . formatted . Model.Log.id . snd
-    , headed "description" $ pretty . trimmed v . description . snd
     , headed "time" $ pretty . formatted . minutesToTime . minute . snd
+    , headed "id" $ pretty . isCustom . Model.Log.id . snd
+    , headed "description" $ pretty . trimmed v . description . snd
     , headed "amount" $ pretty . formatted . amount . snd
     , case v of
       Verbose -> ncol
       Normal  -> ncol
       Minimal -> mempty
     ]
-    where ncol = lmap (second nutrients) $ colonnade v
+   where
+    ncol = lmap (second nutrients) $ colonnade v
+    isCustom (EFID (Left  i)) = "*" +| formatted i |+ ""
+    isCustom (EFID (Right i)) = formatted i
+
+  table Minimal = pretty . formatted . Model.Log.id . V.head
+  table v       = ascii (colonnade v) . indexed
 

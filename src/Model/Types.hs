@@ -43,7 +43,7 @@ instance Formatted Id where
   formatted (Id a) = build a
 
 instance Formatted EFID where
-  formatted (EFID (Left  (Id i))) = "*" +| i |+ ""
+  formatted (EFID (Left  (Id i))) = build i
   formatted (EFID (Right (Id i))) = build i
 
 instance AsQueryParam EFID where
@@ -54,7 +54,7 @@ instance AsQueryParam Description where
   qparam (Description d) = "description" =: d
 
 instance AsQueryParam Amount where
-  qparam (Amount a) = "amount" =: a
+  qparam (Amount a) = "grams" =: a
 
 instance AsQueryParam Page where
   qparam (Page page) = "page" =: page

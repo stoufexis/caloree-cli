@@ -32,19 +32,11 @@ instance Tabled Food where
     , headed "description" $ pretty . trimmed Normal . description . snd
     ]
 
-  colonnade Normal = mconcat
+  colonnade _ = mconcat
     [ headed "energy" (pretty . energy . nutrients . snd)
     , headed "#" $ pretty . fst
     , headed "id" $ pretty . formatted . Model.Food.id . snd
     , headed "description" $ pretty . trimmed Normal . description . snd
-    , headed "amount" $ pretty . formatted . grams . snd
-    ]
-
-  colonnade Verbose = mconcat
-    [ headed "energy" (pretty . energy . nutrients . snd)
-    , headed "#" $ pretty . fst
-    , headed "id" $ pretty . formatted . Model.Food.id . snd
-    , headed "description" $ pretty . trimmed Verbose . description . snd
     , headed "amount" $ pretty . formatted . grams . snd
     , ncol
     ]

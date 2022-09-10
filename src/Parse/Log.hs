@@ -1,41 +1,26 @@
 module Parse.Log
   ( parseLogCommands
   ) where
-import           Model.Command                  ( Command
-                                                  ( AddLog
-                                                  , RemoveLog
-                                                  , UndoLog
-                                                  , UpdateLog
-                                                  , ViewLog
-                                                  )
-                                                )
+import           Model.Command
+import           Model.Types
 import           Options.Applicative
-import           Parse.Common                   ( addFoodAmountOption
-                                                , dateOption
-                                                , efidOptionMandatory
-                                                , limitOption
-                                                , logFiltersOption
-                                                , pageOption
-                                                , timeOption
-                                                , verbosityOption
-                                                )
+import           Parse.Common
 
 updateLog :: Mod CommandFields Command
-updateLog = command
-  "update"
-  (info (UpdateLog <$> logFiltersOption <*> addFoodAmountOption) description)
-  where description = fullDesc <> progDesc "Create new custom food"
+updateLog = command "update" $ info
+  (UpdateLog <$> logFiltersOption <*> addFoodAmountOption)
+  (fullDesc <> progDesc "Create new custom food")
 
 deleteLog :: Mod CommandFields Command
-deleteLog = command "delete"
-                    (info (RemoveLog <$> logFiltersOption) description)
-  where description = fullDesc <> progDesc "Create new custom food"
+deleteLog = command "delete" $ info
+  (RemoveLog <$> logFiltersOption)
+  (fullDesc <> progDesc "Create new custom food")
 
 undoLog :: Mod CommandFields Command
-undoLog = command "undo"
-                  (info (UndoLog <$> logFiltersOption <*> times) description)
+undoLog = command "undo" $ info
+  (UndoLog <$> logFiltersOption <*> times)
+  (fullDesc <> progDesc "Create new custom food")
  where
-  description = fullDesc <> progDesc "Create new custom food"
   times =
     option (auto @Int) $ long "times" <> short 'n' <> metavar "TIMES" <> help
       "Will undo this many times"
@@ -44,15 +29,18 @@ viewLog :: Mod CommandFields Command
 viewLog = command
   "view"
   (info
-    (   ViewLog
-    <$> verbosityOption
+    (   makeViewLog
+    <$> resultNum
+    <*> verbosityOption
     <*> logFiltersOption
     <*> pageOption
     <*> limitOption
     )
-    description
+    (fullDesc <> progDesc "View all logs matching filters")
   )
-  where description = fullDesc <> progDesc "View all logs matching filters"
+ where
+  makeViewLog (Just n) _ f _ _ = ViewLog (Just Minimal) f (Just $ Page n) (Just $ Limit 1)
+  makeViewLog Nothing  v d p l = ViewLog v d p l
 
 addLog :: Mod CommandFields Command
 addLog = command
@@ -71,9 +59,5 @@ addLog = command
 parseLogCommands :: Mod CommandFields Command
 parseLogCommands = command "log" $ info
   (hsubparser $ addLog <> viewLog <> updateLog <> deleteLog <> undoLog)
-  description
- where
-  description =
-    fullDesc <> progDesc "Commands for viewing and manipulating logs" <> header
-      "Search foods"
+  (fullDesc <> progDesc "Commands for viewing and manipulating logs")
 

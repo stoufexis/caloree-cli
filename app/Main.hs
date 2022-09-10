@@ -32,13 +32,13 @@ getDate = do
 main :: IO ()
 main = cnf >>= runReaderT exec
  where
-  exec = parseCommand >>= executeCommand >>= (liftIO . print)
+  exec = parseCommand >>= executeCommand >>= (liftIO . putStrLn)
   cnf =
     AppConfig
-      <$> fmap T.pack     (getEnv "HOST")
-      <*> fmap read       (getEnv "PORT")
-      <*> fmap fromString (getEnv "USERNAME")
-      <*> fmap fromString (getEnv "PASSWORD")
+      <$> fmap T.pack (getEnv "HOST")
+      <*> fmap read   (getEnv "PORT")
+      <*> pure "stef1" -- fmap fromString (getEnv "USERNAME")
+      <*> pure "password1" -- fmap fromString (getEnv "PASSWORD")
       <*> getDate
       <*> getTime
 

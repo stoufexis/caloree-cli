@@ -20,7 +20,6 @@ execute req v = fmap (table v . V.fromList) req
 execute_ :: (Monad m) => m () -> m String
 execute_ req = req >> pure "Ok!"
 
-
 executeCommand :: (MonadReader AppConfig m, MonadIO m) => Command -> m String
 executeCommand (SearchFood v d p l) = execute (getFoods d p l) $ def v
 executeCommand (SearchCustomFood v d p l) =

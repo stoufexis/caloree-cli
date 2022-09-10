@@ -15,6 +15,7 @@ module Parse.Common
   , dateOption
   , timeOption
   , efidOptionMandatory
+  , resultNum
   ) where
 import qualified Data.Text                     as T
 import           Data.Text                      ( split )
@@ -203,3 +204,7 @@ logFiltersOption =
     <> value Nothing
     )
 
+resultNum :: Parser (Maybe Integer)
+resultNum = option
+  (readMMaybe id)
+  (short 'n' <> help "Equivelant to -v 0 -l 1 -p `n`" <> value Nothing)
