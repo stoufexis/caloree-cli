@@ -1,6 +1,8 @@
 module Parse.ParseCommand
   ( parseCommand
   ) where
+import           Control.Monad.Cont             ( MonadIO(liftIO) )
+import           Model.Command                  ( Command )
 import           Options.Applicative            ( execParser
                                                 , helper
                                                 , hsubparser
@@ -12,8 +14,8 @@ import           Parse.Food                     ( parseFoodCommands )
 import           Parse.Log                      ( parseLogCommands )
 
 
-parseCommand :: IO ()
-parseCommand = execParser (info (helper <*> subcommands) idm) >>= print
+parseCommand :: MonadIO m => m Command
+parseCommand = liftIO $ execParser (info (helper <*> subcommands) idm)
  where
   subcommands =
     hsubparser
