@@ -18,15 +18,12 @@ import           Fmt                            ( pretty )
 import           Http.Common                    ( reqUnsecure )
 import           Model.Command                  ( LogFilters(..)
                                                 , dateOrDefault
+                                                , timeOrDefault
                                                 )
 import           Model.Config
 import           Model.DateTime
 import           Model.Log                      ( Log )
-import           Model.Types                    ( Amount
-                                                , EFID
-                                                , Limit(..)
-                                                , Page(..)
-                                                )
+import           Model.Types
 import           Network.HTTP.Req
 import           Typeclass.AsQueryParam         ( AsQueryParam(qparam) )
 import           Typeclass.WithDefault          ( def )
@@ -37,10 +34,10 @@ getLogsRequest
   -> Maybe Limit
   -> LogFilters
   -> m [Log]
-getLogsRequest p l fs = fmap responseBody request
+getLogsRequest p l fs@LogFilters { date } = fmap responseBody request
  where
   request =
-    dateOrDefault fs
+    dateOrDefault date
       >>= reqUnsecure GET (/: "log") NoReqBody jsonResponse
       .   makeParams
 
@@ -57,9 +54,9 @@ getLogsRequest p l fs = fmap responseBody request
 
   intervalParam = qparam . def . interval
 
-postLog
-  :: (MonadReader AppConfig m, MonadIO m, ToJSON a) => a -> m IgnoreResponse
-postLog b = reqUnsecure POST (/: "log") (ReqBodyJson b) ignoreResponse mempty
+postLog :: (MonadReader AppConfig m, MonadIO m, ToJSON a) => a -> m ()
+postLog b =
+  reqUnsecure POST (/: "log") (ReqBodyJson b) ignoreResponse mempty >> pure ()
 
 addLogRequest
   :: forall m
@@ -69,33 +66,27 @@ addLogRequest
   -> Maybe Time
   -> EFID
   -> m ()
-addLogRequest amount date time fid = body >>= postLog >> pure ()
+addLogRequest amount date time fid = body >>= postLog
  where
   body =
-    (\d t -> AddLogDto fid amount (pretty $ formatted d) (timeToMinutes t))
-      <$> dateDefault date
-      <*> timeDefault time
-
-  timeDefault (Just a) = pure a
-  timeDefault Nothing  = fmap (\AppConfig { time = t } -> t) ask
-
-  dateDefault (Just a) = pure a
-  dateDefault Nothing  = fmap (\AppConfig { date = d } -> d) ask
+    AddLogDto fid amount
+      <$> fmap (pretty . formatted) (dateOrDefault date)
+      <*> fmap timeToMinutes        (timeOrDefault time)
 
 removeLogRequest :: (MonadReader AppConfig m, MonadIO m) => LogFilters -> m ()
-removeLogRequest lf@LogFilters { fid, interval } =
-  dateOrDefault lf >>= postLog . makeBody >> pure ()
+removeLogRequest LogFilters { date, fid, interval } =
+  dateOrDefault date >>= postLog . makeBody
   where makeBody d = RemoveLogDto fid (pretty $ formatted d) (def interval)
 
 undoLogRequest
   :: (MonadReader AppConfig m, MonadIO m) => LogFilters -> Int -> m ()
-undoLogRequest lf@LogFilters { fid, interval } times =
-  dateOrDefault lf >>= postLog . makeBody >> pure ()
+undoLogRequest LogFilters { date, fid, interval } times =
+  dateOrDefault date >>= postLog . makeBody
   where makeBody d = UndoLogDto fid (pretty $ formatted d) (def interval) times
 
 updateLogRequest
   :: (MonadReader AppConfig m, MonadIO m) => LogFilters -> Amount -> m ()
-updateLogRequest lf@LogFilters { fid, interval } amount =
-  dateOrDefault lf >>= postLog . makeBody >> pure ()
+updateLogRequest LogFilters { date, fid, interval } amount =
+  dateOrDefault date >>= postLog . makeBody
  where
   makeBody d = ModifyLogDto fid amount (pretty $ formatted d) (def interval)

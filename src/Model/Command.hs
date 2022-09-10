@@ -4,6 +4,7 @@ module Model.Command
   , Command(..)
   , LogFilters(..)
   , dateOrDefault
+  , timeOrDefault
   ) where
 import           Control.Monad.RWS              ( MonadReader(ask) )
 import           Model.Config                   ( AppConfig(..) )
@@ -17,9 +18,13 @@ data LogFilters = LogFilters
   , fid      :: Maybe EFID
   }
 
-dateOrDefault :: MonadReader AppConfig m => LogFilters -> m Date
-dateOrDefault (LogFilters { date = Just d }) = pure d
-dateOrDefault _ = fmap (\(AppConfig { date = d }) -> d) ask
+timeOrDefault :: MonadReader AppConfig f => Maybe Time -> f Time
+timeOrDefault (Just a) = pure a
+timeOrDefault Nothing  = fmap (\AppConfig { time = t } -> t) ask
+
+dateOrDefault :: MonadReader AppConfig f => Maybe Date -> f Date
+dateOrDefault (Just a) = pure a
+dateOrDefault Nothing  = fmap (\AppConfig { date = d } -> d) ask
 
 data Command = AddLog Amount (Maybe Date) (Maybe Time) EFID
              | UpdateLog LogFilters Amount
