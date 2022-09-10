@@ -97,6 +97,7 @@ library
     , profunctors
     , req
     , text
+    , time
     , transformers
     , utf8-string
     , vector
@@ -147,6 +148,7 @@ executable caloree-cli-exe
     , profunctors
     , req
     , text
+    , time
     , transformers
     , utf8-string
     , vector
@@ -198,6 +200,7 @@ test-suite caloree-cli-test
     , profunctors
     , req
     , text
+    , time
     , transformers
     , utf8-string
     , vector

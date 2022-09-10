@@ -33,6 +33,7 @@ dependencies:
 - utf8-string
 - profunctors
 - optparse-applicative
+- time
 
 ghc-options:
 - -Wall
