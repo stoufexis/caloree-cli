@@ -10,6 +10,7 @@ module Model.DateTime
   , timeToMinutes
   , toRange
   , minutesToTime
+  , TimeRound(..)
   ) where
 import           Data.Aeson
 import           Data.Text                      ( Text )
@@ -33,9 +34,10 @@ data Time = Time
   , minute :: Integer
   }
 
-newtype Minute = Minute Integer
-newtype Offset = Offset Integer
-newtype Group  = Group Integer
+newtype Minute    = Minute Integer
+newtype Offset    = Offset Integer
+newtype Group     = Group Integer
+newtype TimeRound = TimeRound Integer
 
 data Inteval = Inteval (Maybe Minute) (Maybe Group) (Maybe Offset)
 
@@ -90,9 +92,8 @@ instance AsQueryParam Offset where
 instance AsQueryParam Date where
   qparam d = "date" =: ((pretty $ formatted d) :: String)
 
-instance WithDefault Inteval where
-  withDefault =
-    Inteval (Just $ Minute 15) (Just withDefault) (Just withDefault)
+instance WithDefault TimeRound where
+  withDefault = TimeRound 15
 
 instance WithDefault Group where
   withDefault = Group 0
@@ -110,6 +111,7 @@ instance ToJSON Inteval where
   toEncoding i =
     let (start, end) = toRange i in pairs ("start" .= start <> "end" .= end)
 
+deriving instance Show TimeRound
 deriving instance Show Inteval
 deriving instance Show Group
 deriving instance Show Minute

@@ -11,11 +11,8 @@ import           Http.CustomFoodRequest
 import           Http.FoodRequest
 import           Http.LogRequest
 import           Http.User                      ( getTargetNutrients )
-import           Model.Command                  ( Command(..)
-                                                , LogFilters(..)
-                                                )
+import           Model.Command                  ( Command(..) )
 import           Model.Config                   ( AppConfig(..) )
-import           Model.DateTime                 ( Inteval(Inteval), Minute (Minute) )
 import           Model.Log
 import           Model.NutrientsProgress
 import           Model.Types
@@ -36,24 +33,18 @@ executeCommand (SearchCustomFood v d p l) =
 executeCommand (ViewFood       v i a) = execute (getFood i a) $ def v
 executeCommand (ViewCustomFood v i a) = execute (getCustomFood i a) $ def v
 
-executeCommand (ViewLog (Just Minimal) f p l) =
+executeCommand (ViewLog _ (Just Minimal) f p l) =
   execute (getLogsRequest p l f) Minimal
 
-executeCommand (ViewLog v f p l) =
+executeCommand (ViewLog r v f p l) =
   (\logs targets ->
       showLogsAndProgress logs (makeProgress (sumNutrients logs) targets)
     )
-    <$> fmap (logsRoundTime (interval f)) (getLogsRequest p l f)
+    <$> fmap (roundTime $ def r) (getLogsRequest p l f)
     <*> getTargetNutrients
  where
-  logsRoundTime (Inteval (Just m) _ _) = roundTime m
-  logsRoundTime _                      = roundTime $ Minute 15
-
   showLogsAndProgress logs progresses = T.unlines
     [table (def v) (V.fromList logs), table (def v) (V.fromList progresses)]
-
-
-
 
 executeCommand (UpdateLog lf a    ) = execute_ $ updateLogRequest lf a
 executeCommand (UndoLog   lf t    ) = execute_ $ undoLogRequest lf t

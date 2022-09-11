@@ -13,6 +13,7 @@ import           Data.Text                      ( Text )
 import           Fmt
 import           GHC.Generics                   ( Generic )
 import           Model.DateTime                 ( Minute(..)
+                                                , TimeRound(TimeRound)
                                                 , minutesToTime
                                                 )
 
@@ -36,8 +37,8 @@ data Log = Log
 sumNutrients :: [Log] -> Nutrients
 sumNutrients = mconcat . map nutrients
 
-roundTime :: Minute -> [Log] -> [Log]
-roundTime (Minute m) = map makeTime
+roundTime :: TimeRound -> [Log] -> [Log]
+roundTime (TimeRound m) = map makeTime
  where
   makeTime l@Log { minute = Minute m' } =
     let rest       = m' `mod` m

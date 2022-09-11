@@ -30,7 +30,7 @@ data Command = AddLog Amount (Maybe Date) (Maybe Time) EFID
              | UpdateLog LogFilters Amount
              | RemoveLog LogFilters
              | UndoLog LogFilters Int
-             | ViewLog (Maybe Verbosity) LogFilters (Maybe Page) (Maybe Limit)
+             | ViewLog (Maybe TimeRound) (Maybe Verbosity) LogFilters (Maybe Page) (Maybe Limit)
              | SearchFood (Maybe Verbosity) Description (Maybe Page) (Maybe Limit)
              | ViewFood (Maybe Verbosity) Id (Maybe Amount)
              | SearchCustomFood (Maybe Verbosity) Description (Maybe Page) (Maybe Limit)

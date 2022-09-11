@@ -16,6 +16,7 @@ module Parse.Common
   , timeOption
   , efidOptionMandatory
   , resultNum
+  , timeRoundOption
   ) where
 import qualified Data.Text                     as T
 import           Data.Text                      ( split )
@@ -25,7 +26,7 @@ import           Model.DateTime                 ( Date(Date)
                                                 , Inteval(Inteval)
                                                 , Minute(Minute)
                                                 , Offset(Offset)
-                                                , Time(Time)
+                                                , Time(Time), TimeRound (TimeRound)
                                                 )
 import           Model.Types
 import           Options.Applicative
@@ -170,6 +171,16 @@ timeOption = option
   <> long "time"
   <> metavar "TIME"
   <> help "Time in the form `HH:MM`"
+  <> value Nothing
+  )
+
+timeRoundOption :: Parser (Maybe TimeRound)
+timeRoundOption = option
+  (fmap (Just . TimeRound) auto)
+  (  short 'r'
+  <> long "round"
+  <> metavar "ROUND"
+  <> help "Present logs with time rounded to `r`"
   <> value Nothing
   )
 

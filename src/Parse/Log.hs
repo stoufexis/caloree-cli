@@ -30,7 +30,8 @@ viewLog = command
   "view"
   (info
     (   makeViewLog
-    <$> resultNum
+    <$> timeRoundOption
+    <*> resultNum
     <*> verbosityOption
     <*> logFiltersOption
     <*> pageOption
@@ -39,8 +40,9 @@ viewLog = command
     (fullDesc <> progDesc "View all logs matching filters")
   )
  where
-  makeViewLog (Just n) _ f _ _ = ViewLog (Just Minimal) f (Just $ Page n) (Just $ Limit 1)
-  makeViewLog Nothing  v d p l = ViewLog v d p l
+  makeViewLog r (Just n) _ f _ _ =
+    ViewLog r (Just Minimal) f (Just $ Page n) (Just $ Limit 1)
+  makeViewLog r Nothing v d p l = ViewLog r v d p l
 
 addLog :: Mod CommandFields Command
 addLog = command
