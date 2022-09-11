@@ -1,13 +1,14 @@
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 module Model.Types
   ( Verbosity(..)
-  , Amount(..)
+  , Grams(..)
   , Id(..)
   , Description(..)
   , trimmed
   , Page(..)
   , Limit(..)
   , EFID(..)
+  , Kcal(..)
   ) where
 import           Control.Applicative
 import           Data.Aeson.Types
@@ -22,7 +23,8 @@ import           Typeclass.WithDefault          ( WithDefault(..) )
 
 data Verbosity = Minimal | Normal | Verbose deriving Enum
 
-newtype Amount      = Amount Integer
+newtype Grams       = Grams Float
+newtype Kcal        = Kcal Float
 newtype Id          = Id Integer
 newtype Description = Description Text
 newtype Page        = Page Integer
@@ -36,8 +38,11 @@ trimmed Minimal (Description d) = T.take 50 d
 trimmed Normal  (Description d) = T.take 100 d
 trimmed Verbose (Description d) = d
 
-instance Formatted Amount where
-  formatted (Amount a) = a |+ " gr"
+instance Formatted Grams where
+  formatted (Grams a) = a |+ " gr"
+
+instance Formatted Kcal where
+  formatted (Kcal a) = a |+ " kcal"
 
 instance Formatted Id where
   formatted (Id a) = build a
@@ -53,8 +58,8 @@ instance AsQueryParam EFID where
 instance AsQueryParam Description where
   qparam (Description d) = "description" =: d
 
-instance AsQueryParam Amount where
-  qparam (Amount a) = "grams" =: a
+instance AsQueryParam Grams where
+  qparam (Grams a) = "grams" =: a
 
 instance AsQueryParam Page where
   qparam (Page page) = "page" =: page
@@ -71,18 +76,23 @@ instance WithDefault Limit where
 instance WithDefault Verbosity where
   withDefault = Normal
 
-instance WithDefault Amount where
-  withDefault = Amount 100
+instance WithDefault Grams where
+  withDefault = Grams 100
+
+deriving instance Num Grams
+deriving instance Num Kcal
 
 deriving instance Show Verbosity
-deriving instance Show Amount
+deriving instance Show Kcal
+deriving instance Show Grams
 deriving instance Show Id
 deriving instance Show Description
 deriving instance Show Page
 deriving instance Show Limit
 
 deriving instance Generic Verbosity
-deriving instance Generic Amount
+deriving instance Generic Kcal
+deriving instance Generic Grams
 deriving instance Generic Id
 deriving instance Generic Description
 deriving instance Generic Page
@@ -96,7 +106,8 @@ instance ToJSON EFID where
   toEncoding (EFID (Right i)) = pairs ("food_id" .= i)
 
 instance ToJSON Verbosity
-instance ToJSON Amount
+instance ToJSON Kcal
+instance ToJSON Grams
 instance ToJSON Id
 instance ToJSON Description
 instance ToJSON Page
@@ -109,7 +120,8 @@ instance FromJSON EFID where
     i' = fmap (EFID . Right) . withObject "EFID" (.: "food_id")
 
 instance FromJSON Verbosity
-instance FromJSON Amount
+instance FromJSON Kcal
+instance FromJSON Grams
 instance FromJSON Id
 instance FromJSON Description
 instance FromJSON Page

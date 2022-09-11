@@ -29,7 +29,7 @@ data Log = Log
   , day         :: Text
   , minute      :: Minute
   , description :: Description
-  , amount      :: Amount
+  , amount      :: Grams
   , nutrients   :: Nutrients
   }
   deriving (Show, Generic)

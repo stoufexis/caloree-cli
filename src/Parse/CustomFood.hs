@@ -9,6 +9,9 @@ import           Model.Command                  ( Command
                                                   )
                                                 )
 import           Model.Nutrients                ( Nutrients(Nutrients) )
+import           Model.Types                    ( Grams(Grams)
+                                                , Kcal(Kcal)
+                                                )
 import           Options.Applicative
 import           Parse.Common                   ( descriptionOption
                                                 , idFoodViewOption
@@ -38,27 +41,30 @@ addCustomFood = command
   commandDescription = fullDesc <> progDesc "Create new custom food"
 
   energy =
-    option (auto @Float)
+    option (fmap Kcal auto)
       $  long "energy"
       <> short 'e'
       <> metavar "ENERGY"
       <> help "Energy of custom food"
 
   protein =
-    option (auto @Float)
+    option (fmap Grams auto)
       $  long "protein"
       <> short 'p'
       <> metavar "PROTEIN"
       <> help "Protein of custom food"
 
   carbs =
-    option (auto @Float) $ long "carbs" <> short 'c' <> metavar "CARBS" <> help
-      "Carbs of custom food"
+    option (fmap Grams auto)
+      $  long "carbs"
+      <> short 'c'
+      <> metavar "CARBS"
+      <> help "Carbs of custom food"
 
-  fat = option (auto @Float) $ long "fat" <> metavar "FAT" <> help
+  fat = option (fmap Grams auto) $ long "fat" <> metavar "FAT" <> help
     "Fat of custom food"
 
-  fiber = option (auto @Float) $ long "fiber" <> metavar "FIBER" <> help
+  fiber = option (fmap Grams auto) $ long "fiber" <> metavar "FIBER" <> help
     "Fiber of custom food"
 
 deleteCustomFood :: Mod CommandFields Command

@@ -8,7 +8,7 @@ import Model.DateTime
 
 data AddLogDto = AddLogDto
   { fid    :: EFID
-  , amount :: Amount
+  , amount :: Grams
   , day    :: Text
   , minute :: Minute
   }

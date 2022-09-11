@@ -17,7 +17,7 @@ data CustomFood = CustomFood
   { id          :: Id
   , userId      :: Id
   , description :: Description
-  , grams       :: Amount
+  , grams       :: Grams
   , nutrients   :: Nutrients
   }
   deriving (Show, Generic)

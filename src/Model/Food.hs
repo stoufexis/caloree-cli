@@ -18,7 +18,7 @@ import           Typeclass.Tabled               ( Tabled(..) )
 data Food = Food
   { id          :: Id
   , description :: Description
-  , grams       :: Amount
+  , grams       :: Grams
   , nutrients   :: Nutrients
   }
   deriving (Show, Generic)
@@ -33,7 +33,7 @@ instance Tabled Food where
     ]
 
   colonnade _ = mconcat
-    [ headed "energy" (pretty . energy . nutrients . snd)
+    [ headed "energy" (pretty . formatted . energy . nutrients . snd)
     , headed "#" $ pretty . fst
     , headed "id" $ pretty . formatted . Model.Food.id . snd
     , headed "description" $ pretty . trimmed Normal . description . snd

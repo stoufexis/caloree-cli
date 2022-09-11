@@ -8,21 +8,36 @@ import qualified Data.Text                     as T
 import           Fmt
 import           Model.Nutrients                ( Nutrients(..) )
 import           Model.Types
+import           Typeclass.Formatted
 import           Typeclass.Tabled
+
+data ProgressUnit = G Grams | E Kcal
+
+toFloat :: ProgressUnit -> Float
+toFloat (G (Grams g)) = g
+toFloat (E (Kcal  g)) = g
+
+roundPU :: ProgressUnit -> ProgressUnit
+roundPU (G (Grams g)) = G $ Grams $ fromInteger $ round g
+roundPU (E (Kcal  g)) = E $ Kcal $ fromInteger $ round g
+
+instance Formatted ProgressUnit where
+  formatted (G g) = formatted g
+  formatted (E g) = formatted g
 
 data NutrientsProgress = NutrientsProgress
   { nutrientName :: Text
-  , progress     :: Float
-  , target       :: Float
+  , progress     :: ProgressUnit
+  , target       :: ProgressUnit
   }
 
 makeProgress :: Nutrients -> Nutrients -> [NutrientsProgress]
 makeProgress nutrients nutrients' =
-  [ mk energy  "energy"
-  , mk protein "protein"
-  , mk carbs   "carbs"
-  , mk fat     "fat"
-  , mk fiber   "fiber"
+  [ mk (E . energy)  "energy"
+  , mk (G . protein) "protein"
+  , mk (G . carbs)   "carbs"
+  , mk (G . fat)     "fat"
+  , mk (G . fiber)   "fiber"
   ]
  where
   mk pick name = NutrientsProgress name (pick nutrients) (pick nutrients')
@@ -37,13 +52,15 @@ instance Tabled NutrientsProgress where
    where
     ratio :: Verbosity -> NutrientsProgress -> Builder
     ratio Verbose NutrientsProgress { progress, target } =
-      build progress |+ " - " +| build target
+      formatted progress |+ " - " +| formatted target
 
     ratio _ NutrientsProgress { progress, target } =
-      build (round progress :: Integer) |+ " - " +| build (round target :: Integer)
+      formatted (roundPU progress) |+ " - " +| formatted (roundPU target)
 
-    progressBar NutrientsProgress { progress = p, target = t } =
-      T.unfoldr (unfoldf (p * 100 / t)) 0
+    progressBar NutrientsProgress { progress, target } =
+      let p = toFloat progress
+          t = toFloat target
+      in  T.unfoldr (unfoldf (p * 100 / t)) 0
 
     unfoldf p x | x >= 100  = Nothing
                 | x >= p    = Just ('-', x + 1)

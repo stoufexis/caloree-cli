@@ -12,13 +12,7 @@ import           Http.Common                    ( reqUnsecure )
 import           Model.Config                   ( AppConfig )
 import           Model.Food                     ( Food )
 import           Model.FoodPreview              ( FoodPreview )
-import           Model.Types                    ( Amount
-                                                , Description(..)
-                                                , EFID(EFID)
-                                                , Id(Id)
-                                                , Limit(..)
-                                                , Page(..)
-                                                )
+import           Model.Types
 import           Network.HTTP.Req
 import           Typeclass.AsQueryParam         ( AsQueryParam(qparam) )
 import           Typeclass.WithDefault          ( def )
@@ -38,7 +32,7 @@ getFoods d p l = baseGetFood $ qparam d <> qparam (def p) <> qparam (def l)
 
 
 getFood
-  :: (MonadReader AppConfig m, MonadIO m) => Id -> Maybe Amount -> m [Food]
+  :: (MonadReader AppConfig m, MonadIO m) => Id -> Maybe Grams -> m [Food]
 getFood (Id i) a =
   fmap pure $ baseGetFood $ qparam (EFID $ Right $ Id i) <> qparam (def a)
 

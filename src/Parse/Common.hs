@@ -85,9 +85,9 @@ idFoodViewOption :: Parser Id
 idFoodViewOption =
   option readMId (long "id" <> short 'i' <> metavar "ID" <> help "Id of a food")
 
-viewFoodAmountOption :: Parser (Maybe Amount)
+viewFoodAmountOption :: Parser (Maybe Grams)
 viewFoodAmountOption = option
-  (readMMaybe Amount)
+  (readMMaybe Grams)
   (  long "amount"
   <> short 'a'
   <> metavar "AMOUNT"
@@ -95,9 +95,9 @@ viewFoodAmountOption = option
   <> value Nothing
   )
 
-addFoodAmountOption :: Parser Amount
+addFoodAmountOption :: Parser Grams
 addFoodAmountOption = option
-  (fmap Amount auto)
+  (fmap Grams auto)
   (long "amount" <> short 'a' <> metavar "AMOUNT" <> help "Amount of food")
 
 parseDate :: (Date -> a) -> ReadM a

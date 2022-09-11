@@ -33,7 +33,7 @@ getCustomFoods d p l = fmap responseBody request
 getCustomFood
   :: (MonadReader AppConfig m, MonadIO m)
   => Id
-  -> Maybe Amount
+  -> Maybe Grams
   -> m [CustomFood]
 getCustomFood (Id i) _ = fmap (pure . responseBody) request
  where

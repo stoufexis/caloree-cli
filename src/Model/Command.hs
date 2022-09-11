@@ -26,15 +26,15 @@ dateOrDefault :: MonadReader AppConfig f => Maybe Date -> f Date
 dateOrDefault (Just a) = pure a
 dateOrDefault Nothing  = fmap (\AppConfig { date = d } -> d) ask
 
-data Command = AddLog Amount (Maybe Date) (Maybe Time) EFID
-             | UpdateLog LogFilters Amount
+data Command = AddLog Grams (Maybe Date) (Maybe Time) EFID
+             | UpdateLog LogFilters Grams
              | RemoveLog LogFilters
              | UndoLog LogFilters Int
              | ViewLog (Maybe TimeRound) (Maybe Verbosity) LogFilters (Maybe Page) (Maybe Limit)
              | SearchFood (Maybe Verbosity) Description (Maybe Page) (Maybe Limit)
-             | ViewFood (Maybe Verbosity) Id (Maybe Amount)
+             | ViewFood (Maybe Verbosity) Id (Maybe Grams)
              | SearchCustomFood (Maybe Verbosity) Description (Maybe Page) (Maybe Limit)
-             | ViewCustomFood (Maybe Verbosity) Id (Maybe Amount)
+             | ViewCustomFood (Maybe Verbosity) Id (Maybe Grams)
              | AddCustomFood Description Nutrients
              | DeleteCustomFood Id
 

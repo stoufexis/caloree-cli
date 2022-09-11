@@ -4,13 +4,13 @@ module Dto.UpdateLog
 import           Data.Aeson.Types
 import           Data.Text                      ( Text )
 import           Model.DateTime                 ( Inteval )
-import           Model.Types                    ( Amount
+import           Model.Types                    ( Grams
                                                 , EFID
                                                 )
 
 data ModifyLogDto = ModifyLogDto
   { fid       :: Maybe EFID
-  , newAmount :: Amount
+  , newAmount :: Grams
   , day       :: Text
   , minute    :: Inteval
   }
