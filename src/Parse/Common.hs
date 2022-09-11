@@ -166,8 +166,9 @@ efidOptionMandatory = fmap EFID $ cfidOpt <|> fidOpt
 timeOption :: Parser (Maybe Time)
 timeOption = option
   (parseTime Just)
-  (  long "day"
-  <> metavar "DAY"
+  (  short 't'
+  <> long "time"
+  <> metavar "TIME"
   <> help "Time in the form `HH:MM`"
   <> value Nothing
   )
@@ -176,7 +177,7 @@ logFiltersOption :: Parser LogFilters
 logFiltersOption =
   LogFilters <$> intervalOpt <*> dateOption <*> efidOptionOptional
  where
-  intervalOpt = fmap Just $ Inteval <$> window <*> group <*> offset
+  intervalOpt = Inteval <$> window <*> group <*> offset
   window      = option
     (readMMaybe Minute)
     (  long "window"

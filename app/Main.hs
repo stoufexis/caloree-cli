@@ -5,8 +5,8 @@ module Main
 import           Control.Monad.Reader           ( MonadIO(liftIO)
                                                 , ReaderT(runReaderT)
                                                 )
-import           Data.String
 import qualified Data.Text                     as T
+import qualified Data.Text.IO                  as TIO
 import           Data.Time
 import           Lib                            ( executeCommand )
 import           Model.Config
@@ -32,7 +32,7 @@ getDate = do
 main :: IO ()
 main = cnf >>= runReaderT exec
  where
-  exec = parseCommand >>= executeCommand >>= (liftIO . putStrLn)
+  exec = parseCommand >>= executeCommand >>= (liftIO . TIO.putStrLn)
   cnf =
     AppConfig
       <$> fmap T.pack (getEnv "HOST")

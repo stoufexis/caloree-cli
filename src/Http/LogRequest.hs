@@ -52,7 +52,7 @@ getLogsRequest p l fs@LogFilters { date } = fmap responseBody request
   idParam LogFilters { fid = Just i } = qparam i
   idParam _                           = mempty
 
-  intervalParam = qparam . def . interval
+  intervalParam = qparam . interval
 
 postLog :: (MonadReader AppConfig m, MonadIO m, ToJSON a) => a -> m ()
 postLog b =
@@ -76,17 +76,16 @@ addLogRequest amount date time fid = body >>= postLog
 removeLogRequest :: (MonadReader AppConfig m, MonadIO m) => LogFilters -> m ()
 removeLogRequest LogFilters { date, fid, interval } =
   dateOrDefault date >>= postLog . makeBody
-  where makeBody d = RemoveLogDto fid (pretty $ formatted d) (def interval)
+  where makeBody d = RemoveLogDto fid (pretty $ formatted d) interval
 
 undoLogRequest
   :: (MonadReader AppConfig m, MonadIO m) => LogFilters -> Int -> m ()
 undoLogRequest LogFilters { date, fid, interval } times =
   dateOrDefault date >>= postLog . makeBody
-  where makeBody d = UndoLogDto fid (pretty $ formatted d) (def interval) times
+  where makeBody d = UndoLogDto fid (pretty $ formatted d) interval times
 
 updateLogRequest
   :: (MonadReader AppConfig m, MonadIO m) => LogFilters -> Amount -> m ()
 updateLogRequest LogFilters { date, fid, interval } amount =
   dateOrDefault date >>= postLog . makeBody
- where
-  makeBody d = ModifyLogDto fid amount (pretty $ formatted d) (def interval)
+  where makeBody d = ModifyLogDto fid amount (pretty $ formatted d) interval

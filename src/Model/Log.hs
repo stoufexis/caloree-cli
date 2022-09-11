@@ -1,5 +1,7 @@
 module Model.Log
-  ( Log
+  ( Log(..)
+  , sumNutrients
+  , roundTime
   ) where
 import           Colonnade
 import           Control.Arrow                  ( Arrow(second) )
@@ -31,6 +33,17 @@ data Log = Log
   }
   deriving (Show, Generic)
 
+sumNutrients :: [Log] -> Nutrients
+sumNutrients = mconcat . map nutrients
+
+roundTime :: Minute -> [Log] -> [Log]
+roundTime (Minute m) = map makeTime
+ where
+  makeTime l@Log { minute = Minute m' } =
+    let rest       = m' `mod` m
+        additional = if rest > (m `div` 2) then m else 0
+    in  l { minute = Minute $ m' `div` m * m + additional }
+
 instance ToJSON Log
 instance FromJSON Log
 
@@ -52,5 +65,5 @@ instance Tabled Log where
     isCustom (EFID (Right i)) = formatted i
 
   table Minimal = pretty . formatted . Model.Log.id . V.head
-  table v       = ascii (colonnade v) . indexed
+  table v       = pretty . ascii (colonnade v) . indexed
 

@@ -23,6 +23,16 @@ data Nutrients = Nutrients
 instance ToJSON Nutrients
 instance FromJSON Nutrients
 
+instance Semigroup Nutrients where
+  n <> n' = Nutrients (energy n + energy n')
+                      (protein n + protein n')
+                      (carbs n + carbs n')
+                      (fat n + fat n')
+                      (fiber n + fiber n')
+
+instance Monoid Nutrients where
+  mempty = Nutrients 0 0 0 0 0
+
 instance Tabled Nutrients where
   colonnade v = mconcat
     [ headed "energy" $ present energy "kcal"

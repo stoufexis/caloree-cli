@@ -34,6 +34,7 @@ library
       Http.CustomFoodRequest
       Http.FoodRequest
       Http.LogRequest
+      Http.User
       Lib
       Model.Command
       Model.Config
@@ -44,6 +45,7 @@ library
       Model.FoodPreview
       Model.Log
       Model.Nutrients
+      Model.NutrientsProgress
       Model.Types
       Model.User
       Parse.Common

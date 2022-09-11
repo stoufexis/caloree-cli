@@ -39,7 +39,16 @@ newtype Group  = Group Integer
 
 data Inteval = Inteval (Maybe Minute) (Maybe Group) (Maybe Offset)
 
+-- If Window is given without Group then ignore it
 toRange :: Inteval -> (Integer, Integer)
+toRange (Inteval (Just _) Nothing offset) =
+  let (Offset o) = def offset
+      (Minute m) = withDefault
+      (Group  g) = withDefault
+      start      = m * g + o
+      end        = start + m
+  in  (start, end)
+
 toRange (Inteval grouping group offset) =
   let (Offset o) = def offset
       (Minute m) = def grouping
@@ -83,7 +92,7 @@ instance AsQueryParam Date where
 
 instance WithDefault Inteval where
   withDefault =
-    Inteval (Just withDefault) (Just withDefault) (Just withDefault)
+    Inteval (Just $ Minute 15) (Just withDefault) (Just withDefault)
 
 instance WithDefault Group where
   withDefault = Group 0

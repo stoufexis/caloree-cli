@@ -13,7 +13,7 @@ import           Model.Nutrients
 import           Model.Types
 
 data LogFilters = LogFilters
-  { interval :: Maybe Inteval
+  { interval :: Inteval
   , date     :: Maybe Date
   , fid      :: Maybe EFID
   }

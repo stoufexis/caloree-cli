@@ -42,5 +42,5 @@ instance Tabled FoodPreview where
     ]
 
   table Minimal = pretty . formatted . Model.FoodPreview.id . V.head
-  table v       = ascii (colonnade v) . indexed
+  table v       = pretty . ascii (colonnade v) . indexed
 

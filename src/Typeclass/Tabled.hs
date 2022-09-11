@@ -10,11 +10,13 @@ import           Data.Vector                    ( Vector
                                                 , indexed
                                                 )
 import           Model.Types                    ( Verbosity )
+import Data.Text (Text)
+import qualified Data.Text as T
 
 class Tabled a where
   colonnade :: Verbosity -> Colonnade Headed (Int, a) String
-  table :: Verbosity -> Vector a -> String
+  table :: Verbosity -> Vector a -> Text
 
-  default table :: Verbosity -> Vector a -> String
-  table v = ascii (colonnade v) . indexed
+  default table :: Verbosity -> Vector a -> Text
+  table v = T.pack . ascii (colonnade v) . indexed
 
