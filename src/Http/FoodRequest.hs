@@ -32,8 +32,8 @@ getFoods d p l = baseGetFood $ qparam d <> qparam (def p) <> qparam (def l)
 
 
 getFood
-  :: (MonadReader AppConfig m, MonadIO m) => Id -> Maybe Grams -> m [Food]
+  :: (MonadReader AppConfig m, MonadIO m) => Id -> Maybe Grams -> m Food
 getFood (Id i) a =
-  fmap pure $ baseGetFood $ qparam (EFID $ Right $ Id i) <> qparam (def a)
+  baseGetFood $ qparam (EFID $ Right $ Id i) <> qparam (def a)
 
 

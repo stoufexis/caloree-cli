@@ -31,11 +31,8 @@ getCustomFoods d p l = fmap responseBody request
   params  = qparam d <> qparam (def p) <> qparam (def l)
 
 getCustomFood
-  :: (MonadReader AppConfig m, MonadIO m)
-  => Id
-  -> Maybe Grams
-  -> m [CustomFood]
-getCustomFood (Id i) _ = fmap (pure . responseBody) request
+  :: (MonadReader AppConfig m, MonadIO m) => Id -> Maybe Grams -> m CustomFood
+getCustomFood (Id i) _ = fmap responseBody request
  where
   path x = x /: "custom-food" /~ i
   request = reqUnsecure GET path NoReqBody jsonResponse mempty

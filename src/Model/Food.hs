@@ -2,12 +2,14 @@
 module Model.Food
   ( Food(..)
   ) where
-import           Colonnade                      ( headed )
-import           Control.Arrow                  ( Arrow(second) )
+import           Colonnade                      ( ascii
+                                                , headed
+                                                )
 import           Data.Aeson                     ( FromJSON
                                                 , ToJSON
                                                 )
-import           Data.Profunctor                ( Profunctor(lmap) )
+import qualified Data.Vector                   as V
+import           Data.Vector                    ( indexed )
 import           Fmt                            ( pretty )
 import           GHC.Generics                   ( Generic )
 import           Model.DateTime                 ( formatted )
@@ -27,18 +29,14 @@ instance ToJSON Food
 instance FromJSON Food
 
 instance Tabled Food where
-  colonnade Minimal = mconcat
+  colonnade v = mconcat
     [ headed "#" $ pretty . fst
-    , headed "description" $ pretty . trimmed Normal . description . snd
+    , headed "id" $ pretty . formatted . Model.Food.id . snd
+    , headed "description" $ pretty . trimmed v . description . snd
+    , headed "amount" $ pretty . formatted . grams . snd
+    , headed "energy" (pretty . formatted . energy . nutrients . snd)
     ]
 
-  colonnade _ = mconcat
-    [ headed "energy" (pretty . formatted . energy . nutrients . snd)
-    , headed "#" $ pretty . fst
-    , headed "id" $ pretty . formatted . Model.Food.id . snd
-    , headed "description" $ pretty . trimmed Normal . description . snd
-    , headed "amount" $ pretty . formatted . grams . snd
-    , ncol
-    ]
-    where ncol = lmap (second nutrients) $ colonnade Verbose
+  table Minimal = pretty . formatted . Model.Food.id . V.head
+  table v       = pretty . ascii (colonnade v) . indexed
 
