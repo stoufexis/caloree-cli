@@ -6,13 +6,8 @@ import           Colonnade
 import qualified Colonnade.Encode              as E
 import           Data.Text
 import qualified Data.Text                     as T
-import           Fmt
 
-renderTable
-  :: Foldable f
-  => Colonnade Headed a Text -- ^ columnar encoding
-  -> f a -- ^ rows
-  -> Text
+renderTable :: Foldable f => Colonnade Headed a Text -> f a -> Text
 renderTable col xs = T.unlines
   [ makeRow makeSingleColumnDivider "+"
   , makeRow makeSingleColumnH       "|"
@@ -20,23 +15,26 @@ renderTable col xs = T.unlines
   ]
  where
   sizedCol = E.sizeColumns T.length xs col
-
   makeRow columnf end = mconcat [E.headerMonoidalFull sizedCol columnf, end]
 
-  makeSingleColumnH = \case
-    (E.Sized (Just sz) (Headed c)) -> "| " +| rightPad sz ' ' c |+ " "
-    (E.Sized Nothing   _         ) -> ""
+  makeSingleColumnH (E.Sized (Just sz) (Headed c)) =
+    mconcat ["| ", rightPad sz ' ' c, " "]
+  makeSingleColumnH (E.Sized Nothing _) = ""
 
 renderBody
   :: Foldable f => Colonnade (E.Sized (Maybe Int) Headed) a Text -> f a -> Text
 renderBody sizedCol xs = mconcat [divider, rowContents, divider]
  where
-  makeSingleColumn (E.Sized (Just sz) _) c = "| " +| rightPad sz ' ' c |+ " "
-  makeSingleColumn (E.Sized Nothing   _) _ = ""
+  makeSingleColumn (E.Sized (Just sz) _) c =
+    mconcat ["| ", rightPad sz ' ' c, " "]
+  makeSingleColumn (E.Sized Nothing _) _ = ""
 
-  divider = E.headerMonoidalFull sizedCol makeSingleColumnDivider <> "+\n"
+  divider =
+    mconcat [E.headerMonoidalFull sizedCol makeSingleColumnDivider, "+", "\n"]
+
   rowContents =
-    let makeRow x = E.rowMonoidalHeader sizedCol makeSingleColumn x <> "|\n"
+    let makeRow x =
+          mconcat [E.rowMonoidalHeader sizedCol makeSingleColumn x, "|", "\n"]
     in  foldMap makeRow xs
 
 makeSingleColumnDivider :: E.Sized (Maybe Int) f a -> Text
