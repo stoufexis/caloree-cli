@@ -72,6 +72,7 @@ default-extensions:
   - LambdaCase
   - GADTs
   - StandaloneDeriving
+  - RankNTypes
 
 library:
   source-dirs: src

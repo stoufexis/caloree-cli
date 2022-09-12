@@ -21,6 +21,7 @@ import           Data.Vector                    ( indexed )
 import qualified Data.Vector                   as V
 import           Model.Nutrients
 import           Model.Types
+import           RenderTable                    ( renderTable )
 import           Typeclass.Formatted
 import           Typeclass.Tabled               ( Tabled(..) )
 
@@ -66,5 +67,5 @@ instance Tabled Log where
     isCustom (EFID (Right i)) = formatted i
 
   table Minimal = pretty . formatted . Model.Log.id . V.head
-  table v       = pretty . ascii (colonnade v) . indexed
+  table v       = renderTable (colonnade v) . indexed
 

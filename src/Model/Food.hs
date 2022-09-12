@@ -2,9 +2,7 @@
 module Model.Food
   ( Food(..)
   ) where
-import           Colonnade                      ( ascii
-                                                , headed
-                                                )
+import           Colonnade                      ( headed )
 import           Data.Aeson                     ( FromJSON
                                                 , ToJSON
                                                 )
@@ -15,6 +13,7 @@ import           GHC.Generics                   ( Generic )
 import           Model.DateTime                 ( formatted )
 import           Model.Nutrients                ( Nutrients(..) )
 import           Model.Types
+import           RenderTable                    ( renderTable )
 import           Typeclass.Tabled               ( Tabled(..) )
 
 data Food = Food
@@ -38,5 +37,5 @@ instance Tabled Food where
     ]
 
   table Minimal = pretty . formatted . Model.Food.id . V.head
-  table v       = pretty . ascii (colonnade v) . indexed
+  table v       = renderTable (colonnade v) . indexed
 

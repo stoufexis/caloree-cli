@@ -81,20 +81,21 @@ idFoodViewOption :: Parser Id
 idFoodViewOption =
   option readMId (long "id" <> short 'i' <> metavar "ID" <> help "Id of a food")
 
-viewFoodAmountOption :: Parser (Maybe Grams)
-viewFoodAmountOption = option
-  (readMMaybe Grams)
+gramsOpt :: ReadM a -> Mod OptionFields a -> Parser a
+gramsOpt f v = option
+  f
   (  long "amount"
   <> short 'a'
   <> metavar "AMOUNT"
-  <> help "Nutrients of food per this amount"
-  <> value Nothing
+  <> help "Amount of food in grams"
+  <> v
   )
 
+viewFoodAmountOption :: Parser (Maybe Grams)
+viewFoodAmountOption = gramsOpt (readMMaybe Grams) (value Nothing)
+
 addFoodAmountOption :: Parser Grams
-addFoodAmountOption = option
-  (fmap Grams auto)
-  (long "amount" <> short 'a' <> metavar "AMOUNT" <> help "Amount of food")
+addFoodAmountOption = gramsOpt (fmap Grams auto) mempty
 
 parseDate :: (Date -> a) -> ReadM a
 parseDate f = eitherReader (\x -> parse x $ split delimiters $ T.pack x)

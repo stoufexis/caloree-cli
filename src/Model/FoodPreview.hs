@@ -2,9 +2,7 @@
 module Model.FoodPreview
   ( FoodPreview(..)
   ) where
-import           Colonnade                      ( ascii
-                                                , headed
-                                                )
+import           Colonnade                      ( headed )
 import           Data.Aeson
 import qualified Data.Vector                   as V
 import           Data.Vector                    ( indexed )
@@ -12,6 +10,7 @@ import           Fmt
 import           GHC.Generics
 import           Model.DateTime                 ( formatted )
 import           Model.Types
+import           RenderTable                    ( renderTable )
 import           Typeclass.Tabled
 
 data FoodPreview = FoodPreview
@@ -42,5 +41,5 @@ instance Tabled FoodPreview where
     ]
 
   table Minimal = pretty . formatted . Model.FoodPreview.id . V.head
-  table v       = pretty . ascii (colonnade v) . indexed
+  table v       = renderTable (colonnade v) . indexed
 

@@ -54,6 +54,8 @@ library
       Parse.Log
       Parse.Nutrients
       Parse.ParseCommand
+      RenderTable
+      Tmp
       Typeclass.AsQueryParam
       Typeclass.Formatted
       Typeclass.Tabled
@@ -88,6 +90,7 @@ library
       LambdaCase
       GADTs
       StandaloneDeriving
+      RankNTypes
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       aeson
@@ -138,6 +141,7 @@ executable caloree-cli-exe
       LambdaCase
       GADTs
       StandaloneDeriving
+      RankNTypes
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
@@ -190,6 +194,7 @@ test-suite caloree-cli-test
       LambdaCase
       GADTs
       StandaloneDeriving
+      RankNTypes
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson

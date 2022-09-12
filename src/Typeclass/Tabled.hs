@@ -4,19 +4,18 @@ module Typeclass.Tabled
   ) where
 import           Colonnade                      ( Colonnade
                                                 , Headed
-                                                , ascii
                                                 )
+import           Data.Text                      ( Text )
 import           Data.Vector                    ( Vector
                                                 , indexed
                                                 )
 import           Model.Types                    ( Verbosity )
-import Data.Text (Text)
-import qualified Data.Text as T
+import           RenderTable                    ( renderTable )
 
 class Tabled a where
-  colonnade :: Verbosity -> Colonnade Headed (Int, a) String
+  colonnade :: Verbosity -> Colonnade Headed (Int, a) Text
   table :: Verbosity -> Vector a -> Text
 
   default table :: Verbosity -> Vector a -> Text
-  table v = T.pack . ascii (colonnade v) . indexed
+  table v = renderTable (colonnade v) . indexed
 
