@@ -5,6 +5,7 @@ module Main
 import           Control.Monad.Reader           ( MonadIO(liftIO)
                                                 , ReaderT(runReaderT)
                                                 )
+import           Data.String
 import qualified Data.Text                     as T
 import qualified Data.Text.IO                  as TIO
 import           Data.Time
@@ -35,10 +36,10 @@ main = cnf >>= runReaderT exec
   exec = parseCommand >>= executeCommand >>= (liftIO . TIO.putStrLn)
   cnf =
     AppConfig
-      <$> fmap T.pack (getEnv "HOST")
-      <*> fmap read   (getEnv "PORT")
-      <*> pure "stef1" -- fmap fromString (getEnv "USERNAME")
-      <*> pure "password1" -- fmap fromString (getEnv "PASSWORD")
+      <$> fmap T.pack     (getEnv "CALOREE_HOST")
+      <*> fmap read       (getEnv "CALOREE_PORT")
+      <*> fmap fromString (getEnv "CALOREE_USERNAME")
+      <*> fmap fromString (getEnv "CALOREE_PASSWORD")
       <*> getDate
       <*> getTime
 

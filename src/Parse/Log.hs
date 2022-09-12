@@ -26,40 +26,33 @@ undoLog = command "undo" $ info
       "Will undo this many times"
 
 viewLog :: Mod CommandFields Command
-viewLog = command
-  "view"
-  (info
-    (   makeViewLog
-    <$> timeRoundOption
-    <*> resultNum
-    <*> verbosityOption
-    <*> logFiltersOption
-    <*> pageOption
-    <*> limitOption
-    )
-    (fullDesc <> progDesc "View all logs matching filters")
+viewLog = command "view" $ info
+  (   makeViewLog
+  <$> timeRoundOption
+  <*> resultNum
+  <*> verbosityOption
+  <*> logFiltersOption
+  <*> pageOption
+  <*> limitOption
   )
+  (fullDesc <> progDesc "View all logs matching filters")
+
  where
   makeViewLog r (Just n) _ f _ _ =
     ViewLog r (Just Minimal) f (Just $ Page n) (Just $ Limit 1)
   makeViewLog r Nothing v d p l = ViewLog r v d p l
 
 addLog :: Mod CommandFields Command
-addLog = command
-  "add"
-  (info
-    (   AddLog
-    <$> addFoodAmountOption
-    <*> dateOption
-    <*> timeOption
-    <*> efidOptionMandatory
-    )
-    (fullDesc <> progDesc "Log a food at an amount")
+addLog = command "add" $ info
+  (   AddLog
+  <$> addFoodAmountOption
+  <*> dateOption
+  <*> timeOption
+  <*> efidOptionMandatory
   )
-
+  (fullDesc <> progDesc "Log a food at an amount")
 
 parseLogCommands :: Mod CommandFields Command
 parseLogCommands = command "log" $ info
   (hsubparser $ addLog <> viewLog <> updateLog <> deleteLog <> undoLog)
   (fullDesc <> progDesc "Commands for viewing and manipulating logs")
-
