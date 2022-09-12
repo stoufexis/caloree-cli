@@ -14,58 +14,34 @@ renderTable
   -> f a -- ^ rows
   -> Text
 renderTable col xs = T.unlines
-  [ divider
-  , mconcat
-    [ E.headerMonoidalFull
-      sizedCol
-      (\(E.Sized msz (Headed h)) -> case msz of
-        Just sz -> "| " +| rightPad sz ' ' h |+ " "
-        Nothing -> ""
-      )
-    , "|"
-    ]
+  [ makeRow makeSingleColumnDivider "+"
+  , makeRow makeSingleColumnH       "|"
   , renderBody sizedCol xs
   ]
  where
   sizedCol = E.sizeColumns T.length xs col
 
-  divider  = mconcat
-    [ E.headerMonoidalFull
-      sizedCol
-      (\(E.Sized msz _) -> case msz of
-        Just sz -> "+" <> hyphens (sz + 2)
-        Nothing -> ""
-      )
-    , "+"
-    ]
+  makeRow columnf end = mconcat [E.headerMonoidalFull sizedCol columnf, end]
+
+  makeSingleColumnH = \case
+    (E.Sized (Just sz) (Headed c)) -> "| " +| rightPad sz ' ' c |+ " "
+    (E.Sized Nothing   _         ) -> ""
 
 renderBody
   :: Foldable f => Colonnade (E.Sized (Maybe Int) Headed) a Text -> f a -> Text
 renderBody sizedCol xs = mconcat [divider, rowContents, divider]
  where
-  divider = mconcat
-    [ E.headerMonoidalFull
-      sizedCol
-      (\(E.Sized msz _) -> case msz of
-        Just sz -> "+" <> hyphens (sz + 2)
-        Nothing -> ""
-      )
-    , "+\n"
-    ]
+  makeSingleColumn (E.Sized (Just sz) _) c = "| " +| rightPad sz ' ' c |+ " "
+  makeSingleColumn (E.Sized Nothing   _) _ = ""
 
-  rowContents = foldMap
-    (\x -> mconcat
-      [ E.rowMonoidalHeader
-        sizedCol
-        (\(E.Sized msz _) c -> case msz of
-          Nothing -> ""
-          Just sz -> "| " +| rightPad sz ' ' c |+ " "
-        )
-        x
-      , "|\n"
-      ]
-    )
-    xs
+  divider = E.headerMonoidalFull sizedCol makeSingleColumnDivider <> "+\n"
+  rowContents =
+    let makeRow x = E.rowMonoidalHeader sizedCol makeSingleColumn x <> "|\n"
+    in  foldMap makeRow xs
+
+makeSingleColumnDivider :: E.Sized (Maybe Int) f a -> Text
+makeSingleColumnDivider (E.Sized (Just sz) _) = "+" <> hyphens (sz + 2)
+makeSingleColumnDivider (E.Sized Nothing   _) = ""
 
 hyphens :: Int -> Text
 hyphens n = T.replicate n "-"
