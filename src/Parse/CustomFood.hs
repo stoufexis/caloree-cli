@@ -8,64 +8,20 @@ import           Model.Command                  ( Command
                                                   , ViewCustomFood
                                                   )
                                                 )
-import           Model.Nutrients                ( Nutrients(Nutrients) )
-import           Model.Types                    ( Grams(Grams)
-                                                , Kcal(Kcal)
-                                                )
 import           Options.Applicative
 import           Parse.Common                   ( descriptionOption
                                                 , idFoodViewOption
                                                 , limitOption
+                                                , nutrientsOption
                                                 , pageOption
                                                 , verbosityOption
                                                 , viewFoodAmountOption
                                                 )
 
 addCustomFood :: Mod CommandFields Command
-addCustomFood = command
-  "add"
-  (info
-    (   acf
-    <$> descriptionOption
-    <*> energy
-    <*> protein
-    <*> carbs
-    <*> fat
-    <*> fiber
-    )
-    commandDescription
-  )
- where
-  acf d e p c f = AddCustomFood d . Nutrients e p c f
-
-  commandDescription = fullDesc <> progDesc "Create new custom food"
-
-  energy =
-    option (fmap Kcal auto)
-      $  long "energy"
-      <> short 'e'
-      <> metavar "ENERGY"
-      <> help "Energy of custom food"
-
-  protein =
-    option (fmap Grams auto)
-      $  long "protein"
-      <> short 'p'
-      <> metavar "PROTEIN"
-      <> help "Protein of custom food"
-
-  carbs =
-    option (fmap Grams auto)
-      $  long "carbs"
-      <> short 'c'
-      <> metavar "CARBS"
-      <> help "Carbs of custom food"
-
-  fat = option (fmap Grams auto) $ long "fat" <> metavar "FAT" <> help
-    "Fat of custom food"
-
-  fiber = option (fmap Grams auto) $ long "fiber" <> metavar "FIBER" <> help
-    "Fiber of custom food"
+addCustomFood = command "add" $ info
+  (AddCustomFood <$> descriptionOption <*> nutrientsOption)
+  (fullDesc <> progDesc "Create new custom food")
 
 deleteCustomFood :: Mod CommandFields Command
 deleteCustomFood = command

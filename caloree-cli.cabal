@@ -52,6 +52,7 @@ library
       Parse.CustomFood
       Parse.Food
       Parse.Log
+      Parse.Nutrients
       Parse.ParseCommand
       Typeclass.AsQueryParam
       Typeclass.Formatted

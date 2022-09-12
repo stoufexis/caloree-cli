@@ -17,17 +17,13 @@ module Parse.Common
   , efidOptionMandatory
   , resultNum
   , timeRoundOption
+  , nutrientsOption
   ) where
 import qualified Data.Text                     as T
 import           Data.Text                      ( split )
 import           Model.Command                  ( LogFilters(LogFilters) )
-import           Model.DateTime                 ( Date(Date)
-                                                , Group(Group)
-                                                , Inteval(Inteval)
-                                                , Minute(Minute)
-                                                , Offset(Offset)
-                                                , Time(Time), TimeRound (TimeRound)
-                                                )
+import           Model.DateTime
+import           Model.Nutrients
 import           Model.Types
 import           Options.Applicative
 import           Text.Read                      ( readEither )
@@ -220,3 +216,35 @@ resultNum :: Parser (Maybe Integer)
 resultNum = option
   (readMMaybe id)
   (short 'n' <> help "Equivelant to -v 0 -l 1 -p `n`" <> value Nothing)
+
+nutrientsOption :: Parser Nutrients
+nutrientsOption = Nutrients <$> energy <*> protein <*> carbs <*> fat <*> fiber
+ where
+  energy =
+    option (fmap Kcal auto)
+      $  long "energy"
+      <> short 'e'
+      <> metavar "ENERGY"
+      <> help "Energy of custom food"
+
+  protein =
+    option (fmap Grams auto)
+      $  long "protein"
+      <> short 'p'
+      <> metavar "PROTEIN"
+      <> help "Protein of custom food"
+
+  carbs =
+    option (fmap Grams auto)
+      $  long "carbs"
+      <> short 'c'
+      <> metavar "CARBS"
+      <> help "Carbs of custom food"
+
+  fat = option (fmap Grams auto) $ long "fat" <> metavar "FAT" <> help
+    "Fat of custom food"
+
+  fiber = option (fmap Grams auto) $ long "fiber" <> metavar "FIBER" <> help
+    "Fiber of custom food"
+
+

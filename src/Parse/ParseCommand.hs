@@ -12,6 +12,7 @@ import           Options.Applicative            ( execParser
 import           Parse.CustomFood               ( parseCustomFoodCommands )
 import           Parse.Food                     ( parseFoodCommands )
 import           Parse.Log                      ( parseLogCommands )
+import           Parse.Nutrients                ( parseUpdateNutrients )
 
 
 parseCommand :: MonadIO m => m Command
@@ -22,4 +23,5 @@ parseCommand = liftIO $ execParser (info (helper <*> subcommands) idm)
       $  parseLogCommands
       <> parseCustomFoodCommands
       <> parseFoodCommands
+      <> parseUpdateNutrients
 

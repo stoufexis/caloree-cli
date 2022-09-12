@@ -37,6 +37,7 @@ data Command = AddLog Grams (Maybe Date) (Maybe Time) EFID
              | ViewCustomFood (Maybe Verbosity) Id (Maybe Grams)
              | AddCustomFood Description Nutrients
              | DeleteCustomFood Id
+             | UpdateTargets Nutrients
 
 deriving instance Show LogFilters
 deriving instance Show Command

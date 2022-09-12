@@ -10,7 +10,9 @@ import qualified Data.Vector                   as V
 import           Http.CustomFoodRequest
 import           Http.FoodRequest
 import           Http.LogRequest
-import           Http.User                      ( getTargetNutrients )
+import           Http.User                      ( getTargetNutrients
+                                                , upsertNutrients
+                                                )
 import           Model.Command                  ( Command(..) )
 import           Model.Config                   ( AppConfig(..) )
 import qualified Model.CustomFood              as CF
@@ -62,3 +64,4 @@ executeCommand (AddLog a d t i    ) = execute_ $ addLogRequest a d t i
 executeCommand (RemoveLog lf      ) = execute_ $ removeLogRequest lf
 executeCommand (AddCustomFood d n ) = execute_ $ addCustomFood d n
 executeCommand (DeleteCustomFood i) = execute_ $ deleteCustomFood i
+executeCommand (UpdateTargets    n) = execute_ $ upsertNutrients n
