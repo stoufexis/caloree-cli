@@ -13,6 +13,12 @@ import           Typeclass.Tabled
 
 data ProgressUnit = G Grams | E Kcal
 
+data NutrientsProgress = NutrientsProgress
+  { nutrientName :: Text
+  , progress     :: ProgressUnit
+  , target       :: ProgressUnit
+  }
+
 toFloat :: ProgressUnit -> Float
 toFloat (G (Grams g)) = g
 toFloat (E (Kcal  g)) = g
@@ -20,16 +26,6 @@ toFloat (E (Kcal  g)) = g
 roundPU :: ProgressUnit -> ProgressUnit
 roundPU (G (Grams g)) = G $ Grams $ fromInteger $ round g
 roundPU (E (Kcal  g)) = E $ Kcal $ fromInteger $ round g
-
-instance Formatted ProgressUnit where
-  formatted (G g) = formatted g
-  formatted (E g) = formatted g
-
-data NutrientsProgress = NutrientsProgress
-  { nutrientName :: Text
-  , progress     :: ProgressUnit
-  , target       :: ProgressUnit
-  }
 
 makeProgress :: Nutrients -> Nutrients -> [NutrientsProgress]
 makeProgress nutrients nutrients' =
@@ -41,6 +37,10 @@ makeProgress nutrients nutrients' =
   ]
  where
   mk pick name = NutrientsProgress name (pick nutrients) (pick nutrients')
+
+instance Formatted ProgressUnit where
+  formatted (G g) = formatted g
+  formatted (E g) = formatted g
 
 instance Tabled NutrientsProgress where
   colonnade v = mconcat

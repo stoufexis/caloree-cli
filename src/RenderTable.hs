@@ -15,18 +15,21 @@ renderTable col xs = T.unlines
   ]
  where
   sizedCol = E.sizeColumns T.length xs col
+
   makeRow columnf end = mconcat [E.headerMonoidalFull sizedCol columnf, end]
 
   makeSingleColumnH (E.Sized (Just sz) (Headed c)) =
     mconcat ["| ", rightPad sz ' ' c, " "]
+
   makeSingleColumnH (E.Sized Nothing _) = ""
 
 renderBody
   :: Foldable f => Colonnade (E.Sized (Maybe Int) Headed) a Text -> f a -> Text
 renderBody sizedCol xs = mconcat [divider, rowContents, divider]
  where
-  makeSingleColumn (E.Sized (Just sz) _) c =
-    mconcat ["| ", rightPad sz ' ' c, " "]
+  makeSingleColumn (E.Sized (Just s) _) c =
+    mconcat ["| ", rightPad s ' ' c, " "]
+
   makeSingleColumn (E.Sized Nothing _) _ = ""
 
   divider =

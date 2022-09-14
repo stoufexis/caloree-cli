@@ -253,5 +253,3 @@ nutrientsOption = Nutrients <$> energy <*> protein <*> carbs <*> fat <*> fiber
 
   fiber = option (fmap Grams auto) $ long "fiber" <> metavar "FIBER" <> help
     "Fiber of custom food"
-
-
