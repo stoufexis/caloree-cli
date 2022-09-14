@@ -138,28 +138,22 @@ dateOption = option
   <> value Nothing
   )
 
-fidOptPartial :: Mod OptionFields a
-fidOptPartial = long "fid" <> metavar "FOOD_ID" <> help "Id referencing a food"
+efidOptions :: Mod OptionFields a
+efidOptions =
+  long "id" <> short 'i' <> metavar "CUSTOM_FOOD_ID/FOOD_ID" <> help
+    "Id referencing a food"
 
-cfidOptPartial :: Mod OptionFields a
-cfidOptPartial =
-  long "cfid" <> metavar "CUSTOM_FOOD_ID" <> help "Id referencing a custom food"
-
-efidOptionOptional :: Parser (Maybe EFID)
-efidOptionOptional = makeEfid <$> cfidOpt <*> fidOpt
- where
-  makeEfid (Just cfid) _          = Just $ EFID $ Left cfid
-  makeEfid _           (Just fid) = Just $ EFID $ Right fid
-  makeEfid _           _          = Nothing
-
-  fidOpt  = option (readMMaybe Id) (fidOptPartial <> value Nothing)
-  cfidOpt = option (readMMaybe Id) (cfidOptPartial <> value Nothing)
+parseEfid :: ReadM EFID
+parseEfid = eitherReader $ \case
+  '*' : i -> fmap (EFID . Left . Id) $ readEither i
+  i       -> fmap (EFID . Right . Id) $ readEither i
 
 efidOptionMandatory :: Parser EFID
-efidOptionMandatory = fmap EFID $ cfidOpt <|> fidOpt
- where
-  fidOpt  = option (fmap (Right . Id) auto) fidOptPartial
-  cfidOpt = option (fmap (Left . Id) auto) cfidOptPartial
+efidOptionMandatory = option parseEfid efidOptions
+
+efidOptionOptional :: Parser (Maybe EFID)
+efidOptionOptional =
+  option (fmap Just parseEfid) (efidOptions <> value Nothing)
 
 timeOption :: Parser (Maybe Time)
 timeOption = option

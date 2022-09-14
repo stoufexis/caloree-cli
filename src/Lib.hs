@@ -38,14 +38,17 @@ withTargets
   -> m Text
 withTargets Minimal _ as = pure $ table Minimal (V.fromList as)
 withTargets v       n as = fmap make getTargetNutrients
- where
-  make n' = T.unlines [table v $ V.fromList as, table v $ makeProgress n n']
+  where make n' = table v (V.fromList as) <> table v (makeProgress n n')
 
 executeCommand :: (MonadReader AppConfig m, MonadIO m) => Command -> m Text
 executeCommand (SearchFood v d p l) = execute (getFoods d p l) $ def v
 
 executeCommand (SearchCustomFood v d p l) =
   execute (getCustomFoods d p l) $ def v
+
+executeCommand (SearchBothFood v d p l) =
+  (<>) <$> execute (getFoods d p l) (def v) <*> execute (getCustomFoods d p l)
+                                                        (def v)
 
 executeCommand (ViewFood v i a) =
   getFood i a >>= \f -> withTargets (def v) (F.nutrients f) [f]
