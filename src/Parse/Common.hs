@@ -18,6 +18,9 @@ module Parse.Common
   , resultNum
   , timeRoundOption
   , nutrientsOption
+  , descriptionArgument
+  , efidArgument
+  , gramsArgument
   ) where
 import qualified Data.Text                     as T
 import           Data.Text                      ( split )
@@ -50,6 +53,9 @@ verbosityOption = option
   <> help "Choose the amount of output verbosity"
   <> value Nothing
   )
+
+descriptionArgument :: Parser Description
+descriptionArgument = fmap Description $ strArgument (metavar "DESCRIPTION")
 
 descriptionOption :: Parser Description
 descriptionOption = fmap Description $ strOption
@@ -90,6 +96,9 @@ gramsOpt f v = option
   <> help "Amount of food in grams"
   <> v
   )
+
+gramsArgument :: Parser Grams
+gramsArgument = argument (fmap Grams auto) (metavar "AMOUNT")
 
 viewFoodAmountOption :: Parser (Maybe Grams)
 viewFoodAmountOption = gramsOpt (readMMaybe Grams) (value Nothing)
@@ -154,6 +163,9 @@ efidOptionMandatory = option parseEfid efidOptions
 efidOptionOptional :: Parser (Maybe EFID)
 efidOptionOptional =
   option (fmap Just parseEfid) (efidOptions <> value Nothing)
+
+efidArgument :: Parser EFID
+efidArgument = argument parseEfid (metavar "FOOD_ID/CUSTOM_FOOD_ID")
 
 timeOption :: Parser (Maybe Time)
 timeOption = option

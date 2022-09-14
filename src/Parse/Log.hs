@@ -22,8 +22,12 @@ undoLog = command "undo" $ info
   (fullDesc <> progDesc "Create new custom food")
  where
   times =
-    option (auto @Int) $ long "times" <> short 'n' <> metavar "TIMES" <> help
-      "Will undo this many times"
+    option auto
+      $  long "times"
+      <> short 'n'
+      <> metavar "TIMES"
+      <> help "Will undo this many times"
+      <> value 1
 
 viewLog :: Mod CommandFields Command
 viewLog = command "view" $ info
