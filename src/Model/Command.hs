@@ -38,7 +38,6 @@ data Command = AddLog Grams (Maybe Date) (Maybe Time) EFID
              | AddCustomFood Description Nutrients
              | DeleteCustomFood Id
              | UpdateTargets Nutrients
-             | SearchBothFood (Maybe Verbosity) Description (Maybe Page) (Maybe Limit)
 
 deriving instance Show LogFilters
 deriving instance Show Command
