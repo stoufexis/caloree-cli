@@ -5,7 +5,6 @@ module Lib
   ) where
 import           Control.Monad.Reader
 import           Data.Text                      ( Text )
-import qualified Data.Text                     as T
 import qualified Data.Vector                   as V
 import           Http.CustomFoodRequest
 import           Http.FoodRequest
@@ -25,7 +24,10 @@ import           Typeclass.Tabled
 import           Typeclass.WithDefault          ( def )
 
 execute :: (Functor m, Tabled a) => m [a] -> Verbosity -> m Text
-execute req v = fmap (table v . V.fromList) req
+execute req v = fmap withEmpty req
+ where
+  withEmpty [] = ""
+  withEmpty xs = table v $ V.fromList xs
 
 execute_ :: (Monad m) => m () -> m Text
 execute_ req = req >> pure "Ok!"
@@ -37,18 +39,16 @@ withTargets
   -> [a]
   -> m Text
 withTargets Minimal _ as = pure $ table Minimal (V.fromList as)
-withTargets v       n as = fmap make getTargetNutrients
-  where make n' = table v (V.fromList as) <> table v (makeProgress n n')
+withTargets v       n as = getTargetNutrients >>= make
+ where
+  make n' =
+    (<>) <$> execute (pure as) v <*> execute (pure $ makeProgress n n') v
 
 executeCommand :: (MonadReader AppConfig m, MonadIO m) => Command -> m Text
 executeCommand (SearchFood v d p l) = execute (getFoods d p l) $ def v
 
 executeCommand (SearchCustomFood v d p l) =
   execute (getCustomFoods d p l) $ def v
-
-executeCommand (SearchBothFood v d p l) =
-  (<>) <$> execute (getFoods d p l) (def v) <*> execute (getCustomFoods d p l)
-                                                        (def v)
 
 executeCommand (ViewFood v i a) =
   getFood i a >>= \f -> withTargets (def v) (F.nutrients f) [f]

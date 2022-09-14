@@ -10,7 +10,6 @@ import           Model.Nutrients                ( Nutrients(..) )
 import           Model.Types
 import           Typeclass.Formatted
 import           Typeclass.Tabled
-import Data.Vector
 
 data ProgressUnit = G Grams | E Kcal
 
@@ -32,7 +31,7 @@ data NutrientsProgress = NutrientsProgress
   , target       :: ProgressUnit
   }
 
-makeProgress :: Nutrients -> Nutrients -> Vector NutrientsProgress
+makeProgress :: Nutrients -> Nutrients -> [NutrientsProgress]
 makeProgress nutrients nutrients' =
   [ mk (E . energy)  "energy"
   , mk (G . protein) "protein"
