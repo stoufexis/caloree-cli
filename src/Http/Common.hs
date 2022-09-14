@@ -1,6 +1,7 @@
 {-# OPTIONS_GHC -Wno-unused-matches #-}
 module Http.Common
   ( reqUnsecure
+  , reqSecure
   ) where
 import           Control.Monad.RWS              ( MonadIO
                                                 , MonadReader(ask)
@@ -38,7 +39,6 @@ makeReq fhttp fauth method fpath body response params = ask >>= run
   makeParams (AppConfig { username, password, port = p }) =
     fauth username password <> REQ.port p <> params
 
-
 reqUnsecure
   :: ( HttpBodyAllowed (AllowsBody p1) (ProvidesBody p2)
      , MonadReader AppConfig m
@@ -48,9 +48,25 @@ reqUnsecure
      , HttpResponse b
      )
   => p1
-  -> (Url 'Http -> Url scheme)
+  -> (Url 'Http -> Url 'Http)
   -> p2
   -> Proxy b
-  -> Option scheme
+  -> Option 'Http
   -> m b
 reqUnsecure = makeReq http basicAuthUnsafe
+
+reqSecure
+  :: ( HttpBodyAllowed (AllowsBody method) (ProvidesBody body)
+     , MonadIO m
+     , HttpMethod method
+     , HttpBody body
+     , HttpResponse b
+     , MonadReader AppConfig m
+     )
+  => method
+  -> (Url 'Https -> Url 'Https)
+  -> body
+  -> Proxy b
+  -> Option 'Https
+  -> m b
+reqSecure = makeReq https basicAuth
