@@ -10,6 +10,7 @@ import           Model.Command                  ( Command
                                                 )
 import           Options.Applicative
 import           Parse.Common                   ( descriptionOption
+                                                , descriptionOptionOptional
                                                 , idFoodViewOption
                                                 , limitOption
                                                 , nutrientsOption
@@ -32,7 +33,7 @@ searchCustomFood :: Mod CommandFields Command
 searchCustomFood = command "search" $ info
   (   SearchCustomFood
   <$> verbosityOption
-  <*> descriptionOption
+  <*> descriptionOptionOptional
   <*> pageOption
   <*> limitOption
   )

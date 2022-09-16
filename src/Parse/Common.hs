@@ -21,6 +21,7 @@ module Parse.Common
   , descriptionArgument
   , efidArgument
   , gramsArgument
+  , descriptionOptionOptional
   ) where
 import qualified Data.Text                     as T
 import           Data.Text                      ( split )
@@ -54,14 +55,20 @@ verbosityOption = option
   <> value Nothing
   )
 
+descriptionMeta :: Mod OptionFields a
+descriptionMeta =
+  long "description" <> short 'd' <> metavar "DESCRIPTION" <> help
+    "Description to be used for searching"
+
 descriptionArgument :: Parser Description
 descriptionArgument = fmap Description $ strArgument (metavar "DESCRIPTION")
 
 descriptionOption :: Parser Description
-descriptionOption = fmap Description $ strOption
-  (long "description" <> short 'd' <> metavar "DESCRIPTION" <> help
-    "Description to be used for searching"
-  )
+descriptionOption = fmap Description $ strOption descriptionMeta
+
+descriptionOptionOptional :: Parser (Maybe Description)
+descriptionOptionOptional =
+  option (fmap Just readMDesc) (descriptionMeta <> value Nothing)
 
 pageOption :: Parser (Maybe Page)
 pageOption = option
@@ -147,10 +154,9 @@ dateOption = option
   <> value Nothing
   )
 
-efidOptions :: Mod OptionFields a
-efidOptions =
-  long "id" <> short 'i' <> metavar "CUSTOM_FOOD_ID/FOOD_ID" <> help
-    "Id referencing a food"
+efidMeta :: Mod OptionFields a
+efidMeta = long "id" <> short 'i' <> metavar "CUSTOM_FOOD_ID/FOOD_ID" <> help
+  "Id referencing a food"
 
 parseEfid :: ReadM EFID
 parseEfid = eitherReader $ \case
@@ -158,11 +164,10 @@ parseEfid = eitherReader $ \case
   i       -> fmap (EFID . Right . Id) $ readEither i
 
 efidOptionMandatory :: Parser EFID
-efidOptionMandatory = option parseEfid efidOptions
+efidOptionMandatory = option parseEfid efidMeta
 
 efidOptionOptional :: Parser (Maybe EFID)
-efidOptionOptional =
-  option (fmap Just parseEfid) (efidOptions <> value Nothing)
+efidOptionOptional = option (fmap Just parseEfid) (efidMeta <> value Nothing)
 
 efidArgument :: Parser EFID
 efidArgument = argument parseEfid (metavar "FOOD_ID/CUSTOM_FOOD_ID")

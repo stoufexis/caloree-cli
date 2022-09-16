@@ -31,9 +31,9 @@ data Command = AddLog Grams (Maybe Date) (Maybe Time) EFID
              | RemoveLog LogFilters
              | UndoLog LogFilters Int
              | ViewLog (Maybe TimeRound) (Maybe Verbosity) LogFilters (Maybe Page) (Maybe Limit)
-             | SearchFood (Maybe Verbosity) Description (Maybe Page) (Maybe Limit)
+             | SearchFood (Maybe Verbosity) (Maybe Description) (Maybe Page) (Maybe Limit)
              | ViewFood (Maybe Verbosity) Id (Maybe Grams)
-             | SearchCustomFood (Maybe Verbosity) Description (Maybe Page) (Maybe Limit)
+             | SearchCustomFood (Maybe Verbosity) (Maybe Description) (Maybe Page) (Maybe Limit)
              | ViewCustomFood (Maybe Verbosity) Id (Maybe Grams)
              | AddCustomFood Description Nutrients
              | DeleteCustomFood Id

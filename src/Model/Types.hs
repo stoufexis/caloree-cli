@@ -9,6 +9,7 @@ module Model.Types
   , Limit(..)
   , EFID(..)
   , Kcal(..)
+  , Offset(..)
   ) where
 import           Control.Applicative
 import           Data.Aeson.Types
@@ -29,6 +30,7 @@ newtype Id          = Id Integer
 newtype Description = Description Text
 newtype Page        = Page Integer
 newtype Limit       = Limit Integer
+newtype Offset      = Offset Integer
 
 -- Either custom_food_id food_id
 newtype EFID = EFID (Either Id Id) deriving Show
@@ -51,6 +53,9 @@ instance Formatted EFID where
   formatted (EFID (Left  (Id i))) = build i
   formatted (EFID (Right (Id i))) = build i
 
+instance AsQueryParam Offset where
+  qparam (Offset o) = "offset" =: o
+
 instance AsQueryParam EFID where
   qparam (EFID (Right (Id i))) = "food_id" =: i
   qparam (EFID (Left  (Id i))) = "custom_food_id" =: i
@@ -66,6 +71,9 @@ instance AsQueryParam Page where
 
 instance AsQueryParam Limit where
   qparam (Limit limit) = "limit" =: limit
+
+instance WithDefault Description where
+  withDefault = Description ""
 
 instance WithDefault Page where
   withDefault = Page 0

@@ -8,7 +8,7 @@ import           Model.Types                    ( Limit(Limit)
                                                 , Page(Page)
                                                 )
 import           Options.Applicative
-import           Parse.Common                   ( descriptionOption
+import           Parse.Common                   ( descriptionOptionOptional
                                                 , idFoodViewOption
                                                 , limitOption
                                                 , pageOption
@@ -22,7 +22,7 @@ searchFood = command "search" $ info
   (   makeSearchFood
   <$> resultNum
   <*> verbosityOption
-  <*> descriptionOption
+  <*> descriptionOptionOptional
   <*> pageOption
   <*> limitOption
   )

@@ -3,8 +3,6 @@ module Model.DateTime
   ( Date(..)
   , Time(..)
   , Minute(..)
-  , Offset(..)
-  , Group(..)
   , Inteval(..)
   , formatted
   , timeToMinutes
@@ -34,8 +32,6 @@ data Time = Time
   }
 
 newtype Minute    = Minute Integer
-newtype Offset    = Offset Integer
-newtype Group     = Group Integer
 newtype TimeRound = TimeRound Integer
 
 data Inteval = Inteval Time Time
@@ -66,9 +62,6 @@ instance AsQueryParam Inteval where
     let (Minute start, Minute end) = (timeToMinutes b, timeToMinutes e)
     in  "interval" =: (("" +| start |+ "-" +| end |+ "") :: String)
 
-instance AsQueryParam Offset where
-  qparam (Offset o) = "offset" =: o
-
 instance AsQueryParam Date where
   qparam d = "date" =: ((pretty $ formatted d) :: String)
 
@@ -88,26 +81,18 @@ deriving instance Num Minute
 
 deriving instance Show TimeRound
 deriving instance Show Inteval
-deriving instance Show Group
 deriving instance Show Minute
-deriving instance Show Offset
 deriving instance Show Time
 deriving instance Show Date
 
-deriving instance Generic Group
 deriving instance Generic Minute
-deriving instance Generic Offset
 deriving instance Generic Time
 deriving instance Generic Date
 
-instance ToJSON Group
 instance ToJSON Minute
-instance ToJSON Offset
 instance ToJSON Date
 instance ToJSON Time
 
-instance FromJSON Group
 instance FromJSON Minute
-instance FromJSON Offset
 instance FromJSON Date
 instance FromJSON Time

@@ -45,10 +45,10 @@ withTargets v       n as = getTargetNutrients >>= make
     (<>) <$> execute (pure as) v <*> execute (pure $ makeProgress n n') v
 
 executeCommand :: (MonadReader AppConfig m, MonadIO m) => Command -> m Text
-executeCommand (SearchFood v d p l) = execute (getFoods d p l) $ def v
+executeCommand (SearchFood v d p l) = execute (getFoods (def d) p l) $ def v
 
 executeCommand (SearchCustomFood v d p l) =
-  execute (getCustomFoods d p l) $ def v
+  execute (getCustomFoods (def d) p l) $ def v
 
 executeCommand (ViewFood v i a) =
   getFood i a >>= \f -> withTargets (def v) (F.nutrients f) [f]
