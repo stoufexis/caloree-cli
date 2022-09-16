@@ -53,7 +53,7 @@ instance Tabled Log where
   colonnade v = mconcat
     [ headed "#" $ pretty . fst
     , headed "time" $ pretty . formatted . minutesToTime . minute . snd
-    , headed "id" $ pretty . isCustom . Model.Log.id . snd
+    , headed "id" $ pretty . formatted . Model.Log.id . snd
     , headed "description" $ pretty . trimmed v . description . snd
     , headed "amount" $ pretty . formatted . amount . snd
     , case v of
@@ -61,10 +61,7 @@ instance Tabled Log where
       Normal  -> ncol
       Minimal -> mempty
     ]
-   where
-    ncol = lmap (second nutrients) $ colonnade v
-    isCustom (EFID (Left  i)) = "-" +| formatted i |+ ""
-    isCustom (EFID (Right i)) = formatted i
+    where ncol = lmap (second nutrients) $ colonnade v
 
   table Minimal = pretty . formatted . Model.Log.id . V.head
   table v       = renderTable (colonnade v) . indexed

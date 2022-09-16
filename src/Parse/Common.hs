@@ -160,8 +160,9 @@ efidMeta = long "id" <> short 'i' <> metavar "CUSTOM_FOOD_ID/FOOD_ID" <> help
 
 parseEfid :: ReadM EFID
 parseEfid = eitherReader $ \case
-  '-' : i -> fmap (EFID . Left . Id) $ readEither i
-  i       -> fmap (EFID . Right . Id) $ readEither i
+  'c' : i -> fmap (EFID . Left . Id) $ readEither i
+  'f' : i -> fmap (EFID . Right . Id) $ readEither i
+  i       -> Left i
 
 efidOptionMandatory :: Parser EFID
 efidOptionMandatory = option parseEfid efidMeta

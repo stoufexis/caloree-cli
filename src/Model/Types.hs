@@ -50,8 +50,8 @@ instance Formatted Id where
   formatted (Id a) = build a
 
 instance Formatted EFID where
-  formatted (EFID (Left  (Id i))) = build i
-  formatted (EFID (Right (Id i))) = build i
+  formatted (EFID (Left  (Id i))) = "c" <> build i
+  formatted (EFID (Right (Id i))) = "f" <> build i
 
 instance AsQueryParam Offset where
   qparam (Offset o) = "offset" =: o
