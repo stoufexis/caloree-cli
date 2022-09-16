@@ -61,10 +61,10 @@ executeCommand (ViewLog r v f p l) =
     >>= (\l' -> withTargets (def v) (sumNutrients l') l')
     .   roundTime (def r)
 
-executeCommand (UpdateLog lf a    ) = execute_ $ updateLogRequest lf a
-executeCommand (UndoLog   lf t    ) = execute_ $ undoLogRequest lf t
+executeCommand (UpdateLog a d n   ) = execute_ $ updateLogRequest a d n
+executeCommand (UndoLog d t       ) = execute_ $ undoLogRequest d t
 executeCommand (AddLog a d t i    ) = execute_ $ addLogRequest a d t i
-executeCommand (RemoveLog lf      ) = execute_ $ removeLogRequest lf
+executeCommand (RemoveLog     d n ) = execute_ $ removeLogRequest d n
 executeCommand (AddCustomFood d n ) = execute_ $ addCustomFood d n
 executeCommand (DeleteCustomFood i) = execute_ $ deleteCustomFood i
 executeCommand (UpdateTargets    n) = execute_ $ upsertNutrients n

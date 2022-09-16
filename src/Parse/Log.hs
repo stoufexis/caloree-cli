@@ -8,17 +8,17 @@ import           Parse.Common
 
 updateLog :: Mod CommandFields Command
 updateLog = command "update" $ info
-  (UpdateLog <$> logFiltersOption <*> addFoodAmountOption)
+  (UpdateLog <$> addFoodAmountOption <*> dateOptionOptional <*> numOption)
   (fullDesc <> progDesc "Create new custom food")
 
 deleteLog :: Mod CommandFields Command
 deleteLog = command "delete" $ info
-  (RemoveLog <$> logFiltersOption)
+  (RemoveLog <$> dateOptionOptional <*> numOption)
   (fullDesc <> progDesc "Create new custom food")
 
 undoLog :: Mod CommandFields Command
 undoLog = command "undo" $ info
-  (UndoLog <$> logFiltersOption <*> times)
+  (UndoLog <$> dateOptionOptional <*> times)
   (fullDesc <> progDesc "Create new custom food")
  where
   times =
@@ -50,7 +50,7 @@ addLog :: Mod CommandFields Command
 addLog = command "add" $ info
   (   AddLog
   <$> addFoodAmountOption
-  <*> dateOption
+  <*> dateOptionOptional
   <*> timeOption
   <*> efidOptionMandatory
   )

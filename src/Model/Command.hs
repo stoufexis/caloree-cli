@@ -27,9 +27,9 @@ dateOrDefault (Just a) = pure a
 dateOrDefault Nothing  = fmap (\AppConfig { date = d } -> d) ask
 
 data Command = AddLog Grams (Maybe Date) (Maybe Time) EFID
-             | UpdateLog LogFilters Grams
-             | RemoveLog LogFilters
-             | UndoLog LogFilters Int
+             | UpdateLog Grams (Maybe Date) Integer
+             | RemoveLog (Maybe Date) Integer
+             | UndoLog (Maybe Date) Integer
              | ViewLog (Maybe TimeRound) (Maybe Verbosity) LogFilters (Maybe Page) (Maybe Limit)
              | SearchFood (Maybe Verbosity) (Maybe Description) (Maybe Page) (Maybe Limit)
              | ViewFood (Maybe Verbosity) Id (Maybe Grams)

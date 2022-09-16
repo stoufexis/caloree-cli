@@ -3,37 +3,30 @@ module Dto.UpdateLog
   ) where
 import           Data.Aeson.Types
 import           Data.Text                      ( Text )
-import           Model.DateTime                 ( Inteval )
-import           Model.Types                    ( Grams
-                                                , EFID
-                                                )
+import           Model.Types                    ( Grams )
 
 data ModifyLogDto = ModifyLogDto
-  { fid       :: Maybe EFID
-  , newAmount :: Grams
+  { newAmount :: Grams
   , day       :: Text
-  , minute    :: Inteval
+  , num       :: Integer
   }
   deriving Show
 
 instance ToJSON ModifyLogDto where
-  toJSON (ModifyLogDto { fid, newAmount, day, minute }) = object
+  toJSON (ModifyLogDto { newAmount, day, num }) = object
     [ "t" .= ("Modify" :: String)
-    , "fid" .= fid
     , "newAmount" .= newAmount
     , "day" .= day
-    , "minute" .= minute
+    , "num" .= num
     ]
 
-  toEncoding (ModifyLogDto { fid, newAmount, day, minute }) = pairs
+  toEncoding (ModifyLogDto { newAmount, day, num }) = pairs
     (  "t"
     .= ("Modify" :: String)
-    <> "fid"
-    .= fid
     <> "newAmount"
     .= newAmount
     <> "day"
     .= day
-    <> "minute"
-    .= minute
+    <> "num"
+    .= num
     )

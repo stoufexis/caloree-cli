@@ -12,7 +12,8 @@ module Parse.Common
   , viewFoodAmountOption
   , logFiltersOption
   , addFoodAmountOption
-  , dateOption
+  , dateOptionOptional
+  , dateOptionMandatory
   , timeOption
   , efidOptionMandatory
   , resultNum
@@ -22,6 +23,7 @@ module Parse.Common
   , efidArgument
   , gramsArgument
   , descriptionOptionOptional
+  , numOption
   ) where
 import qualified Data.Text                     as T
 import           Data.Text                      ( split )
@@ -143,16 +145,15 @@ parseTime f = eitherReader (\x -> parse x $ split delimiters $ T.pack x)
     ':' -> True
     _   -> False
 
+dateMeta :: Mod OptionFields a
+dateMeta = long "day" <> short 'd' <> metavar "DAY" <> help
+  "Day in the form of `YYYY-MM-DD`"
 
-dateOption :: Parser (Maybe Date)
-dateOption = option
-  (parseDate Just)
-  (  long "day"
-  <> short 'd'
-  <> metavar "DAY"
-  <> help "Day in the form of `YYYY-MM-DD`"
-  <> value Nothing
-  )
+dateOptionOptional :: Parser (Maybe Date)
+dateOptionOptional = option (parseDate Just) (dateMeta <> value Nothing)
+
+dateOptionMandatory :: Parser Date
+dateOptionMandatory = option (parseDate id) dateMeta
 
 efidMeta :: Mod OptionFields a
 efidMeta = long "id" <> short 'i' <> metavar "CUSTOM_FOOD_ID/FOOD_ID" <> help
@@ -183,6 +184,10 @@ timeOption = option
   <> value Nothing
   )
 
+numOption :: Parser Integer
+numOption =
+  option auto $ short 'n' <> long "num" <> metavar "NUM" <> help "Entry number"
+
 timeRoundOption :: Parser (Maybe TimeRound)
 timeRoundOption = option
   (fmap (Just . TimeRound) auto)
@@ -195,7 +200,7 @@ timeRoundOption = option
 
 logFiltersOption :: Parser LogFilters
 logFiltersOption =
-  LogFilters <$> intervalOpt <*> dateOption <*> efidOptionOptional
+  LogFilters <$> intervalOpt <*> dateOptionOptional <*> efidOptionOptional
  where
   intervalOpt = makeInterval <$> begin <*> end
 

@@ -3,35 +3,16 @@ module Dto.UndoLog
   ) where
 import           Data.Aeson.Types
 import           Data.Text                      ( Text )
-import           Model.Types
-import Model.DateTime
 
 data UndoLogDto = UndoLogDto
-  { fid    :: Maybe EFID
-  , day    :: Text
-  , minute :: Inteval
-  , times  :: Int
+  { day   :: Text
+  , times :: Integer
   }
   deriving Show
 
 instance ToJSON UndoLogDto where
-  toJSON (UndoLogDto { fid, day, minute, times }) = object
-    [ "t" .= ("Undo" :: String)
-    , "fid" .= fid
-    , "day" .= day
-    , "minute" .= minute
-    , "times" .= times
-    ]
+  toJSON (UndoLogDto { day, times }) =
+    object ["t" .= ("Undo" :: String), "day" .= day, "times" .= times]
 
-  toEncoding (UndoLogDto { fid, day, minute, times }) = pairs
-    (  "t"
-    .= ("Undo" :: String)
-    <> "fid"
-    .= fid
-    <> "day"
-    .= day
-    <> "minute"
-    .= minute
-    <> "times"
-    .= times
-    )
+  toEncoding (UndoLogDto { day, times }) =
+    pairs ("t" .= ("Undo" :: String) <> "day" .= day <> "times" .= times)

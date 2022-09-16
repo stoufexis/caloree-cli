@@ -3,30 +3,15 @@ module Dto.RemoveLog
   ) where
 import           Data.Aeson.Types
 import           Data.Text                      ( Text )
-import           Model.DateTime
-import           Model.Types                    ( EFID )
 
 data RemoveLogDto = RemoveLogDto
-  { fid    :: Maybe EFID
-  , day    :: Text
-  , minute :: Inteval
+  { day :: Text
+  , num :: Integer
   }
 
 instance ToJSON RemoveLogDto where
-  toJSON (RemoveLogDto { fid, day, minute }) = object
-    [ "t" .= ("Remove" :: String)
-    , "fid" .= fid
-    , "day" .= day
-    , "minute" .= minute
-    ]
+  toJSON (RemoveLogDto { day, num }) =
+    object ["t" .= ("Remove" :: String), "day" .= day, "num" .= num]
 
-  toEncoding (RemoveLogDto { fid, day, minute }) = pairs
-    (  "t"
-    .= ("Remove" :: String)
-    <> "fid"
-    .= fid
-    <> "day"
-    .= day
-    <> "minute"
-    .= minute
-    )
+  toEncoding (RemoveLogDto { day, num }) =
+    pairs ("t" .= ("Remove" :: String) <> "day" .= day <> "num" .= num)
