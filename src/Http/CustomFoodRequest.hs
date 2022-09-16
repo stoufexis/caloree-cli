@@ -32,10 +32,10 @@ getCustomFoods d p l = fmap responseBody request
 
 getCustomFood
   :: (MonadReader AppConfig m, MonadIO m) => Id -> Maybe Grams -> m CustomFood
-getCustomFood (Id i) _ = fmap responseBody request
+getCustomFood i g = fmap responseBody request
  where
-  path x = x /: "custom-food" /~ i
-  request = reqUnsecure GET path NoReqBody jsonResponse mempty
+  params  = qparam (EFID $ Left i) <> qparam (def g)
+  request = reqUnsecure GET (/: "custom-food") NoReqBody jsonResponse params
 
 addCustomFood
   :: (MonadReader AppConfig m, MonadIO m) => Description -> Nutrients -> m ()
