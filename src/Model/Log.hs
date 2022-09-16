@@ -63,7 +63,7 @@ instance Tabled Log where
     ]
    where
     ncol = lmap (second nutrients) $ colonnade v
-    isCustom (EFID (Left  i)) = "*" +| formatted i |+ ""
+    isCustom (EFID (Left  i)) = "-" +| formatted i |+ ""
     isCustom (EFID (Right i)) = formatted i
 
   table Minimal = pretty . formatted . Model.Log.id . V.head

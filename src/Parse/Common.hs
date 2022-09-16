@@ -133,7 +133,7 @@ parseTime f = eitherReader (\x -> parse x $ split delimiters $ T.pack x)
     _ -> Left x
 
   delimiters = \case
-    '-' -> True
+    ':' -> True
     _   -> False
 
 
@@ -154,7 +154,7 @@ efidOptions =
 
 parseEfid :: ReadM EFID
 parseEfid = eitherReader $ \case
-  '*' : i -> fmap (EFID . Left . Id) $ readEither i
+  '-' : i -> fmap (EFID . Left . Id) $ readEither i
   i       -> fmap (EFID . Right . Id) $ readEither i
 
 efidOptionMandatory :: Parser EFID
