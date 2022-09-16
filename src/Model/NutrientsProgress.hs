@@ -47,7 +47,7 @@ instance Tabled NutrientsProgress where
     [ headed "#" $ pretty . fst
     , headed "nutrient" $ pretty . nutrientName . snd
     , headed "ratio" $ pretty . ratio v . snd
-    , headed "progress" $ pretty . progressBar . snd
+    , headed "progress" $ pretty . renderProgressBar 75 . snd
     ]
    where
     ratio :: Verbosity -> NutrientsProgress -> Builder
@@ -57,13 +57,14 @@ instance Tabled NutrientsProgress where
     ratio _ NutrientsProgress { progress, target } =
       formatted (roundPU progress) |+ " - " +| formatted (roundPU target)
 
-    progressBar NutrientsProgress { progress, target } =
-      let p = toFloat progress
-          t = toFloat target
-      in  T.unfoldr (unfoldf (p * 100 / t)) 0
-
-    unfoldf p x | x >= 100  = Nothing
-                | x >= p    = Just ('-', x + 1)
-                | otherwise = Just ('#', x + 1)
+renderProgressBar :: Float -> NutrientsProgress -> Text
+renderProgressBar size NutrientsProgress { progress, target } =
+  let p = toFloat progress
+      t = toFloat target
+  in  T.unfoldr (unfoldf (p * size / t)) 0
+ where
+  unfoldf p x | x >= size = Nothing
+              | x >= p    = Just ('-', x + 1)
+              | otherwise = Just ('#', x + 1)
 
 
