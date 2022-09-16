@@ -32,8 +32,6 @@ instance Tabled Food where
     [ headed "#" $ pretty . fst
     , headed "id" $ pretty . formatted . Model.Food.id . snd
     , headed "description" $ pretty . trimmed v . description . snd
-    , headed "amount" $ pretty . formatted . grams . snd
-    , headed "energy" (pretty . formatted . energy . nutrients . snd)
     ]
 
   table Minimal = pretty . formatted . Model.Food.id . V.head
