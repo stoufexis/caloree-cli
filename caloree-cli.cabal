@@ -109,7 +109,7 @@ library
     , vector
   default-language: Haskell2010
 
-executable caloree-cli-exe
+executable caloree
   main-is: Main.hs
   other-modules:
       Paths_caloree_cli

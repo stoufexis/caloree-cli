@@ -79,7 +79,7 @@ library:
   source-dirs: src
 
 executables:
-  caloree-cli-exe:
+  caloree:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
