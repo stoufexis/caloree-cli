@@ -8,7 +8,6 @@ module Model.DateTime
   , Inteval(..)
   , formatted
   , timeToMinutes
-  , toRange
   , minutesToTime
   , TimeRound(..)
   ) where
@@ -39,25 +38,7 @@ newtype Offset    = Offset Integer
 newtype Group     = Group Integer
 newtype TimeRound = TimeRound Integer
 
-data Inteval = Inteval (Maybe Minute) (Maybe Group) (Maybe Offset)
-
--- If Window is given without Group then ignore it
-toRange :: Inteval -> (Integer, Integer)
-toRange (Inteval (Just _) Nothing offset) =
-  let (Offset o) = def offset
-      (Minute m) = withDefault
-      (Group  g) = withDefault
-      start      = m * g + o
-      end        = start + m
-  in  (start, end)
-
-toRange (Inteval grouping group offset) =
-  let (Offset o) = def offset
-      (Minute m) = def grouping
-      (Group  g) = def group
-      start      = m * g + o
-      end        = start + m
-  in  (start, end)
+data Inteval = Inteval Time Time
 
 timeToMinutes :: Time -> Minute
 timeToMinutes Time { hour, minute } = Minute $ hour * 60 + minute
@@ -78,12 +59,11 @@ instance Formatted Time where
   formatted Time { hour, minute } = hour |+ ":" +| minute |+ ""
 
 instance Formatted Inteval where
-  formatted i =
-    let (start, end) = toRange i in "" +| start |+ "-" +| end |+ ""
+  formatted (Inteval b e) = "" +| formatted b |+ "-" +| formatted e |+ ""
 
 instance AsQueryParam Inteval where
-  qparam i =
-    let (start, end) = toRange i
+  qparam (Inteval b e) =
+    let (Minute start, Minute end) = (timeToMinutes b, timeToMinutes e)
     in  "interval" =: (("" +| start |+ "-" +| end |+ "") :: String)
 
 instance AsQueryParam Offset where
@@ -95,21 +75,16 @@ instance AsQueryParam Date where
 instance WithDefault TimeRound where
   withDefault = TimeRound 15
 
-instance WithDefault Group where
-  withDefault = Group 0
-
-instance WithDefault Minute where
-  withDefault = Minute 1440
-
-instance WithDefault Offset where
-  withDefault = Offset 0
+instance WithDefault Inteval where
+  withDefault = Inteval (minutesToTime 0) (minutesToTime 1440)
 
 instance ToJSON Inteval where
-  toJSON i =
-    let (start, end) = toRange i in object ["start" .= start, "end" .= end]
+  toJSON (Inteval b e) =
+    object ["start" .= timeToMinutes b, "end" .= timeToMinutes e]
+  toEncoding (Inteval b e) =
+    pairs ("start" .= timeToMinutes b <> "end" .= timeToMinutes e)
 
-  toEncoding i =
-    let (start, end) = toRange i in pairs ("start" .= start <> "end" .= end)
+deriving instance Num Minute
 
 deriving instance Show TimeRound
 deriving instance Show Inteval

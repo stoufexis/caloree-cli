@@ -191,33 +191,31 @@ logFiltersOption :: Parser LogFilters
 logFiltersOption =
   LogFilters <$> intervalOpt <*> dateOption <*> efidOptionOptional
  where
-  intervalOpt = Inteval <$> window <*> group <*> offset
-  window      = option
-    (readMMaybe Minute)
-    (  long "window"
-    <> short 'w'
-    <> metavar "WINDOW"
-    <> help "Window results by minutes"
+  intervalOpt = makeInterval <$> begin <*> end
+
+  makeInterval (Just b) (Just e) = Just $ Inteval b e
+  makeInterval (Just b@Time { hour, minute }) Nothing =
+    Just $ Inteval b $ Time hour $ minute + 1
+  makeInterval _ _ = Nothing
+
+  begin = option
+    (fmap Just $ parseTime id)
+    (  short 'b'
+    <> long "begin"
+    <> metavar "BEGIN"
+    <> help "Time to start range in the form `HH:MM`"
     <> value Nothing
     )
 
-  group = option
-    (readMMaybe Group)
-    (  long "group"
-    <> short 'g'
-    <> metavar "GROUP"
-    <> help "Group of results to show"
+  end = option
+    (fmap Just $ parseTime id)
+    (  long "end"
+    <> short 'e'
+    <> metavar "END"
+    <> help "Time to start range in the form `HH:MM`"
     <> value Nothing
     )
 
-  offset = option
-    (readMMaybe Offset)
-    (  long "offset"
-    <> short 'o'
-    <> metavar "offset"
-    <> help "Offset results by this amount of minutes"
-    <> value Nothing
-    )
 
 resultNum :: Parser (Maybe Integer)
 resultNum = option
