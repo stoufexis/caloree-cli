@@ -156,7 +156,7 @@ Ok!
 
 #### Delete the custom food with id 2
 ```
-caloree custom delete --id 2
+> caloree custom delete --id 2
 ```
 *Note: additions and deletions cannot be undone like logs can*
 
