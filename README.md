@@ -17,7 +17,7 @@ Caloree is a simple, self hosted, CLI based nutrition tracker.
 * The foods that are available on startup along with information about their nutrients have been collected from the [USDA FoodData Central](https://fdc.nal.usda.gov/)
 
 ## Caveats
-* Secure communication through HTTPS is technically supported, but not implemented yet. Thus, the server should either be installed locally or accessed via other secure communication channels (e.g. ssh tunneling).
+* Secure communication through HTTPS is technically supported, but not implemented yet. Thus, the server and database should either be installed locally or accessed via other secure communication channels (e.g. ssh tunneling).
 * Around 17.000 foods are available on start-up. This consists of mostly unbranded food products/ingredients so you will probably not find your favorite branded food. For these cases, you can easily create a custom food (see Custom Foods section).
 * Around 400 nutrients are used in the database, but currently only 5 of them are exposed to the user (energy, protein, carbs, fats, fiber).
 
@@ -33,7 +33,7 @@ CALOREE_PORT # port of the caloree server
 
 ## Usage
 
-Help for each command and each flag can be found in the by using the `--help` flag. The rest of this documentation will consist of detailed examples with sample output.
+Help for each command and each flag can be found by using the `--help` flag after any command/subcommand. The rest of this documentation will consist of examples with sample output.
 
 #### Notes
 * On command failure an error will be raised. They don't return appropriate outputs yet.
