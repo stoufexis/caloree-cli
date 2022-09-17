@@ -35,12 +35,12 @@ CALOREE_PORT # port of the caloree server
 
 Help for each command and each flag can be found in the by using the `--help` flag. The rest of this documentation will consist of detailed examples with sample output.
 
-**Note**
+#### Note
 On command failure an error will be raised. They dont return appropriate outputs yet.
 
 ### Search foods
 
-**Return the first 10 foods matching the description "raw potato"**:
+#### Return the first 10 foods matching the description "raw potato"
 ```
 > caloree food search --page 0 --limit 10 --description "raw potato"
 +---+--------+---------------------------------------------------------------------------------------------+
@@ -57,7 +57,7 @@ On command failure an error will be raised. They dont return appropriate outputs
 ```
 *Note: page defaults to 0, limit defaults to 25, description defaults to ""*
 
-**Searching custom foods**:
+#### Searching custom foods
 ```
 > caloree custom search
 ```
@@ -65,7 +65,7 @@ On command failure an error will be raised. They dont return appropriate outputs
 
 ### View Logged Foods
 
-**View the current day's logged foods**
+#### View the current day's logged foods
 ```
 > caloree log view 
 +---+-------+---------+-------------------------------------------+----------+------------+---------+---------+---------+--------+
@@ -89,12 +89,12 @@ On command failure an error will be raised. They dont return appropriate outputs
 ```
 *Note: 'c' prefix means the following id belongs to a custom food, while 'f' prefix means the following id belongs to a pre-existing food.*
 
-**Quicky view current days logs**
+#### Quickly view current days logs
 ```bash
 > caloree # caloree without subcommands and arguments is equivelant to `caloree log view`
 ```
 
-**View the logs on the 16th of September 2022, beginning at 22:00 and ending at 23:00, with time rounded to 1 minute**
+#### View the logs on the 16th of September 2022, beginning at 22:00 and ending at 23:00, with time rounded to 1 minute
 ```
 > caloree log view --day 2022-09-16 --round 1 --begin 22:00 --end 23:00
 +---+-------+---------+------------------------------------------------+----------+------------+---------+---------+---------+--------+
@@ -122,25 +122,25 @@ On command failure an error will be raised. They dont return appropriate outputs
 
 ### Create and alter logs
 
-**Create a log on the current day at 10:45 consisting of 20 grams of a pre-existing food with id 170187**
+#### Create a log on the current day at 10:45 consisting of 20 grams of a pre-existing food with id 170187
 ```
 > caloree log add --id f170187 --time 10:45 --amount 20
 Ok!
 ```
 
-**Delete the second (they are 0-indexed) log of the current day**
+#### Delete the second (they are 0-indexed) log of the current day
 ```
 > caloree log delete -n 1
 Ok!
 ```
 
-**Change the amount of the 15th log on the 16th of September 2022 to 65 grams**
+#### Change the amount of the 15th log on the 16th of September 2022 to 65 grams
 ```
 > caloree log update -d 2022-09-16 -a 65 -n 14
 Ok!
 ```
 
-**Undo the last log change of the 16th of September 2022 (Addition, Deletion, Modification)**
+#### Undo the last log change of the 16th of September 2022 (Addition, Deletion, Modification)
 ```
 > caloree log undo -d 2022-09-16
 Ok!
@@ -148,13 +148,13 @@ Ok!
 
 ### Add and delete custom foods
 
-**Add a food with its nutrients per 100 grams**
+#### Add a food with its nutrients per 100 grams
 ```
 > caloree custom add --description "Empty Calories" --energy 100 --protein 0 --fat 0 --fiber 0 --carbs 0
 Ok!
 ```
 
-**Delete the custom food with id 2**
+#### Delete the custom food with id 2
 ```
 caloree custom delete --id 2
 ```
@@ -162,7 +162,7 @@ caloree custom delete --id 2
 
 ### Update nutrient targets
 
-**Update the nutrient targets that are displayed in the progress section**
+#### Update the nutrient targets that are displayed in the progress section
 ```
 > caloree nutrients -e 2750 -p 200 -c 300 --fat 80 --fiber 30
 ```
