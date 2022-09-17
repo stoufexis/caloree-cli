@@ -8,6 +8,10 @@ import           Model.Command                  ( Command
                                                   , ViewCustomFood
                                                   )
                                                 )
+import           Model.Types                    ( EntryNum(EntryNum)
+                                                , Limit(Limit)
+                                                , Page(Page)
+                                                )
 import           Options.Applicative
 import           Typeclass.Parsed
 
@@ -23,8 +27,12 @@ deleteCustomFood = command "delete" $ info
 
 searchCustomFood :: Mod CommandFields Command
 searchCustomFood = command "search" $ info
-  (SearchCustomFood <$> parserO <*> parserO <*> parserO <*> parserO)
+  (makeSearchFood <$> parserO <*> parserO <*> parserO <*> parserO <*> parserO)
   (fullDesc <> progDesc "Search your custom foods matching the given filters")
+ where
+  makeSearchFood (Just (EntryNum n)) v d _ _ =
+    SearchCustomFood v d (Just $ Page n) (Just $ Limit 1)
+  makeSearchFood Nothing v d p l = SearchCustomFood v d p l
 
 viewCustomFood :: Mod CommandFields Command
 viewCustomFood = command "view" $ info
