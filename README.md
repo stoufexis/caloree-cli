@@ -14,7 +14,7 @@ Caloree is a simple, self hosted, cli based nutrition tracker.
   * The `caloree` command should now be available
 
 ## Note
-* The foods that are available on startup along with information about their nutrients has been gathered from the [USDA FoodData Central](https://fdc.nal.usda.gov/)
+* The foods that are available on startup along with information about their nutrients have been collected from the [USDA FoodData Central](https://fdc.nal.usda.gov/)
 
 ## Caveats
 * Secure communication through HTTPS is technically supported, but not implemented yet. Thus, the server should either be installed locally or accessed via other secure communication channels (e.g. ssh tunelling).
