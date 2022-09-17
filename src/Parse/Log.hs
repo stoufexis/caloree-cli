@@ -34,8 +34,8 @@ viewLog = command "view" $ info
   (fullDesc <> progDesc "View all logs matching filters")
 
  where
-  makeViewLog r (Just (EntryNum n)) _ f _ _ =
-    ViewLog r (Just Minimal) f (Just $ Page n) (Just $ Limit 1)
+  makeViewLog r (Just (EntryNum n)) v f _ _ =
+    ViewLog r v f (Just $ Page n) (Just $ Limit 1)
   makeViewLog r Nothing v d p l = ViewLog r v d p l
 
 addLog :: Mod CommandFields Command

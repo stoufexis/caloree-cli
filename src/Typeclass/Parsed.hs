@@ -199,6 +199,7 @@ instance ParsedOptional EntryNum where
       <> long "num"
       <> metavar "NUM"
       <> help "Entry number"
+      <> value Nothing
 
 helpDefaultText
   :: forall f a a'

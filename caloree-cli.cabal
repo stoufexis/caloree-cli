@@ -54,7 +54,6 @@ library
       Parse.Nutrients
       Parse.ParseCommand
       RenderTable
-      Tmp
       Typeclass.AsQueryParam
       Typeclass.Formatted
       Typeclass.Parsed

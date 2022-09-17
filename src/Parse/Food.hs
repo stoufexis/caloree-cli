@@ -2,7 +2,6 @@ module Parse.Food
   ( parseFoodCommands
   ) where
 import           Model.Command                  ( Command(SearchFood, ViewFood)
-                                                , Verbosity(Minimal)
                                                 )
 import           Model.Types                    ( EntryNum(EntryNum)
                                                 , Limit(Limit)
@@ -18,8 +17,8 @@ searchFood = command "search" $ info
   <> progDesc "Search foods matching the given filters in the database"
   )
  where
-  makeSearchFood (Just (EntryNum n)) _ d _ _ =
-    SearchFood (Just Minimal) d (Just $ Page n) (Just $ Limit 1)
+  makeSearchFood (Just (EntryNum n)) v d _ _ =
+    SearchFood v d (Just $ Page n) (Just $ Limit 1)
   makeSearchFood Nothing v d p l = SearchFood v d p l
 
 viewFood :: Mod CommandFields Command
