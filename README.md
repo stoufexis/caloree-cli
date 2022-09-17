@@ -41,7 +41,7 @@ On command failure an error will be raised. They dont return appropriate outputs
 ### Search foods
 
 **Return the first 10 foods matching the description "raw potato"**:
-```bash
+```
 > caloree food search --page 0 --limit 10 --description "raw potato"
 +---+--------+---------------------------------------------------------------------------------------------+
 | # | id     | description                                                                                 |
@@ -58,7 +58,7 @@ On command failure an error will be raised. They dont return appropriate outputs
 *Note: page defaults to 0, limit defaults to 25, description defaults to ""*
 
 **Searching custom foods**:
-```bash
+```
 > caloree custom search
 ```
 *Note: all arguments are the same as normal food searching*
@@ -66,7 +66,7 @@ On command failure an error will be raised. They dont return appropriate outputs
 ### View Logged Foods
 
 **View the current day's logged foods**
-```bash
+```
 > caloree log view 
 +---+-------+---------+-------------------------------------------+----------+------------+---------+---------+---------+--------+
 | # | time  | id      | description                               | amount   | energy     | protein | carbs   | fat     | fiber  |
@@ -91,11 +91,11 @@ On command failure an error will be raised. They dont return appropriate outputs
 
 **Quicky view current days logs**
 ```bash
-caloree # caloree without subcommands and arguments is equivelant to `caloree log view`
+> caloree # caloree without subcommands and arguments is equivelant to `caloree log view`
 ```
 
 **View the logs on the 16th of September 2022, beginning at 22:00 and ending at 23:00, with time rounded to 1 minute**
-```bash
+```
 > caloree log view --day 2022-09-16 --round 1 --begin 22:00 --end 23:00
 +---+-------+---------+------------------------------------------------+----------+------------+---------+---------+---------+--------+
 | # | time  | id      | description                                    | amount   | energy     | protein | carbs   | fat     | fiber  |
@@ -123,25 +123,25 @@ caloree # caloree without subcommands and arguments is equivelant to `caloree lo
 ### Create and alter logs
 
 **Create a log on the current day at 10:45 consisting of 20 grams of a pre-existing food with id 170187**
-```bash
+```
 > caloree log add --id f170187 --time 10:45 --amount 20
 Ok!
 ```
 
 **Delete the second (they are 0-indexed) log of the current day**
-```bash
+```
 > caloree log delete -n 1
 Ok!
 ```
 
 **Change the amount of the 15th log on the 16th of September 2022 to 65 grams**
-```bash
+```
 > caloree log update -d 2022-09-16 -a 65 -n 14
 Ok!
 ```
 
 **Undo the last log change of the 16th of September 2022 (Addition, Deletion, Modification)**
-```bash
+```
 > caloree log undo -d 2022-09-16
 Ok!
 ```
@@ -149,13 +149,13 @@ Ok!
 ### Add and delete custom foods
 
 **Add a food with its nutrients per 100 grams**
-```bash
+```
 > caloree custom add --description "Empty Calories" --energy 100 --protein 0 --fat 0 --fiber 0 --carbs 0
 Ok!
 ```
 
 **Delete the custom food with id 2**
-```bash
+```
 caloree custom delete --id 2
 ```
 *Note: additions and deletions cannot be undone like logs can*
@@ -163,7 +163,7 @@ caloree custom delete --id 2
 ### Update nutrient targets
 
 **Update the nutrient targets that are displayed in the progress section**
-```bash
+```
 > caloree nutrients -e 2750 -p 200 -c 300 --fat 80 --fiber 30
 ```
 
