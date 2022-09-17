@@ -72,20 +72,20 @@ addLogRequest amount date time fid = body >>= postLog
       <*> fmap timeToMinutes        (timeOrDefault time)
 
 removeLogRequest
-  :: (MonadReader AppConfig m, MonadIO m) => Maybe Date -> Integer -> m ()
-removeLogRequest date num =
+  :: (MonadReader AppConfig m, MonadIO m) => Maybe Date -> EntryNum -> m ()
+removeLogRequest date (EntryNum num) =
   dateOrDefault date >>= \d -> postLog $ RemoveLogDto (pretty $ formatted d) num
 
 undoLogRequest
-  :: (MonadReader AppConfig m, MonadIO m) => Maybe Date -> Integer -> m ()
-undoLogRequest date num =
-  dateOrDefault date >>= \d -> postLog $ UndoLogDto (pretty $ formatted d) num
+  :: (MonadReader AppConfig m, MonadIO m) => Maybe Date -> Maybe UndoTimes -> m ()
+undoLogRequest date times =
+  dateOrDefault date >>= \d -> postLog $ UndoLogDto (pretty $ formatted d) (def times)
 
 updateLogRequest
   :: (MonadReader AppConfig m, MonadIO m)
   => Grams
   -> Maybe Date
-  -> Integer
+  -> EntryNum
   -> m ()
-updateLogRequest amount date num = dateOrDefault date
+updateLogRequest amount date (EntryNum num) = dateOrDefault date
   >>= \d -> postLog $ ModifyLogDto amount (pretty $ formatted d) num

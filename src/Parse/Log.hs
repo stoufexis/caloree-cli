@@ -4,56 +4,43 @@ module Parse.Log
 import           Model.Command
 import           Model.Types
 import           Options.Applicative
-import           Parse.Common
+import           Typeclass.Parsed
 
 updateLog :: Mod CommandFields Command
 updateLog = command "update" $ info
-  (UpdateLog <$> addFoodAmountOption <*> dateOptionOptional <*> numOption)
+  (UpdateLog <$> parserM <*> parserO <*> parserM)
   (fullDesc <> progDesc "Create new custom food")
 
 deleteLog :: Mod CommandFields Command
 deleteLog = command "delete" $ info
-  (RemoveLog <$> dateOptionOptional <*> numOption)
+  (RemoveLog <$> parserO <*> parserM)
   (fullDesc <> progDesc "Create new custom food")
 
 undoLog :: Mod CommandFields Command
 undoLog = command "undo" $ info
-  (UndoLog <$> dateOptionOptional <*> times)
+  (UndoLog <$> parserO <*> parserO)
   (fullDesc <> progDesc "Create new custom food")
- where
-  times =
-    option auto
-      $  long "times"
-      <> short 'n'
-      <> metavar "TIMES"
-      <> help "Will undo this many times"
-      <> value 1
 
 viewLog :: Mod CommandFields Command
 viewLog = command "view" $ info
   (   makeViewLog
-  <$> timeRoundOption
-  <*> resultNum
-  <*> verbosityOption
-  <*> logFiltersOption
-  <*> pageOption
-  <*> limitOption
+  <$> parserO
+  <*> parserO
+  <*> parserO
+  <*> parserM
+  <*> parserO
+  <*> parserO
   )
   (fullDesc <> progDesc "View all logs matching filters")
 
  where
-  makeViewLog r (Just n) _ f _ _ =
+  makeViewLog r (Just (EntryNum n)) _ f _ _ =
     ViewLog r (Just Minimal) f (Just $ Page n) (Just $ Limit 1)
   makeViewLog r Nothing v d p l = ViewLog r v d p l
 
 addLog :: Mod CommandFields Command
 addLog = command "add" $ info
-  (   AddLog
-  <$> addFoodAmountOption
-  <*> dateOptionOptional
-  <*> timeOption
-  <*> efidOptionMandatory
-  )
+  (AddLog <$> parserM <*> parserO <*> parserO <*> parserM)
   (fullDesc <> progDesc "Log a food at an amount")
 
 parseLogCommands :: Mod CommandFields Command

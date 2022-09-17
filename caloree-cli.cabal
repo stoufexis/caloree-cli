@@ -48,7 +48,6 @@ library
       Model.NutrientsProgress
       Model.Types
       Model.User
-      Parse.Common
       Parse.CustomFood
       Parse.Food
       Parse.Log
@@ -58,6 +57,7 @@ library
       Tmp
       Typeclass.AsQueryParam
       Typeclass.Formatted
+      Typeclass.Parsed
       Typeclass.Tabled
       Typeclass.WithDefault
   other-modules:

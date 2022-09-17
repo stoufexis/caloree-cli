@@ -3,10 +3,11 @@ module Dto.UndoLog
   ) where
 import           Data.Aeson.Types
 import           Data.Text                      ( Text )
+import           Model.Types                    ( UndoTimes )
 
 data UndoLogDto = UndoLogDto
   { day   :: Text
-  , times :: Integer
+  , times :: UndoTimes
   }
   deriving Show
 

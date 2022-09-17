@@ -42,6 +42,9 @@ timeToMinutes Time { hour, minute } = Minute $ hour * 60 + minute
 minutesToTime :: Minute -> Time
 minutesToTime (Minute m) = Time (m `div` 60) (m `mod` 60)
 
+instance Formatted TimeRound where
+  formatted (TimeRound a) = build a
+
 instance Formatted Date where
   formatted (Date { year, month, day }) =
     "" +| year |+ "-" +| m |+ "-" +| d |+ ""

@@ -4,39 +4,27 @@ module Parse.Food
 import           Model.Command                  ( Command(SearchFood, ViewFood)
                                                 , Verbosity(Minimal)
                                                 )
-import           Model.Types                    ( Limit(Limit)
+import           Model.Types                    ( EntryNum(EntryNum)
+                                                , Limit(Limit)
                                                 , Page(Page)
                                                 )
 import           Options.Applicative
-import           Parse.Common                   ( descriptionOptionOptional
-                                                , idFoodViewOption
-                                                , limitOption
-                                                , pageOption
-                                                , resultNum
-                                                , verbosityOption
-                                                , viewFoodAmountOption
-                                                )
+import           Typeclass.Parsed
 
 searchFood :: Mod CommandFields Command
 searchFood = command "search" $ info
-  (   makeSearchFood
-  <$> resultNum
-  <*> verbosityOption
-  <*> descriptionOptionOptional
-  <*> pageOption
-  <*> limitOption
-  )
+  (makeSearchFood <$> parserO <*> parserO <*> parserO <*> parserO <*> parserO)
   (  fullDesc
   <> progDesc "Search foods matching the given filters in the database"
   )
  where
-  makeSearchFood (Just n) _ d _ _ =
+  makeSearchFood (Just (EntryNum n)) _ d _ _ =
     SearchFood (Just Minimal) d (Just $ Page n) (Just $ Limit 1)
   makeSearchFood Nothing v d p l = SearchFood v d p l
 
 viewFood :: Mod CommandFields Command
 viewFood = command "view" $ info
-  (ViewFood <$> verbosityOption <*> idFoodViewOption <*> viewFoodAmountOption)
+  (ViewFood <$> parserO <*> parserM <*> parserO)
   (fullDesc <> progDesc "View nutrients of food of a specific amount")
 
 parseFoodCommands :: Mod CommandFields Command

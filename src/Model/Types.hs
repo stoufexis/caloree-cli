@@ -10,6 +10,8 @@ module Model.Types
   , EFID(..)
   , Kcal(..)
   , Offset(..)
+  , EntryNum(..)
+  , UndoTimes(..)
   ) where
 import           Control.Applicative
 import           Data.Aeson.Types
@@ -31,6 +33,8 @@ newtype Description = Description Text
 newtype Page        = Page Integer
 newtype Limit       = Limit Integer
 newtype Offset      = Offset Integer
+newtype UndoTimes   = UndoTimes Integer
+newtype EntryNum    = EntryNum Integer
 
 -- Either custom_food_id food_id
 newtype EFID = EFID (Either Id Id) deriving Show
@@ -39,6 +43,21 @@ trimmed :: Verbosity -> Description -> Text
 trimmed Minimal (Description d) = T.take 50 d
 trimmed Normal  (Description d) = T.take 100 d
 trimmed Verbose (Description d) = d
+
+instance Formatted UndoTimes where
+  formatted (UndoTimes t) = build t
+
+instance Formatted EntryNum where
+  formatted (EntryNum t) = build t
+
+instance Formatted Description where
+  formatted (Description t) = build $ show t
+
+instance Formatted Page where
+  formatted (Page a) = build a
+
+instance Formatted Limit where
+  formatted (Limit a) = build a
 
 instance Formatted Grams where
   formatted (Grams a) = a |+ " gr"
@@ -52,6 +71,9 @@ instance Formatted Id where
 instance Formatted EFID where
   formatted (EFID (Left  (Id i))) = "c" <> build i
   formatted (EFID (Right (Id i))) = "f" <> build i
+
+instance Formatted Verbosity where
+  formatted = pretty . fromEnum
 
 instance AsQueryParam Offset where
   qparam (Offset o) = "offset" =: o
@@ -72,6 +94,9 @@ instance AsQueryParam Page where
 instance AsQueryParam Limit where
   qparam (Limit limit) = "limit" =: limit
 
+instance WithDefault UndoTimes where
+  withDefault = UndoTimes 0
+
 instance WithDefault Description where
   withDefault = Description ""
 
@@ -90,6 +115,7 @@ instance WithDefault Grams where
 deriving instance Num Grams
 deriving instance Num Kcal
 
+deriving instance Show UndoTimes
 deriving instance Show Verbosity
 deriving instance Show Kcal
 deriving instance Show Grams
@@ -98,6 +124,7 @@ deriving instance Show Description
 deriving instance Show Page
 deriving instance Show Limit
 
+deriving instance Generic UndoTimes
 deriving instance Generic Verbosity
 deriving instance Generic Kcal
 deriving instance Generic Grams
@@ -113,6 +140,7 @@ instance ToJSON EFID where
   toEncoding (EFID (Left  i)) = pairs ("custom_food_id" .= i)
   toEncoding (EFID (Right i)) = pairs ("food_id" .= i)
 
+instance ToJSON UndoTimes
 instance ToJSON Verbosity
 instance ToJSON Kcal
 instance ToJSON Grams

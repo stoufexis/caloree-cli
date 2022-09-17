@@ -9,45 +9,27 @@ import           Model.Command                  ( Command
                                                   )
                                                 )
 import           Options.Applicative
-import           Parse.Common                   ( descriptionOption
-                                                , descriptionOptionOptional
-                                                , idFoodViewOption
-                                                , limitOption
-                                                , nutrientsOption
-                                                , pageOption
-                                                , verbosityOption
-                                                , viewFoodAmountOption
-                                                )
+import           Typeclass.Parsed
 
 addCustomFood :: Mod CommandFields Command
 addCustomFood = command "add" $ info
-  (AddCustomFood <$> descriptionOption <*> nutrientsOption)
+  (AddCustomFood <$> parserM <*> parserM)
   (fullDesc <> progDesc "Create new custom food")
 
 deleteCustomFood :: Mod CommandFields Command
 deleteCustomFood = command "delete" $ info
-  (DeleteCustomFood <$> idFoodViewOption)
+  (DeleteCustomFood <$> parserM)
   (fullDesc <> progDesc "Delete a custom food")
 
 searchCustomFood :: Mod CommandFields Command
 searchCustomFood = command "search" $ info
-  (   SearchCustomFood
-  <$> verbosityOption
-  <*> descriptionOptionOptional
-  <*> pageOption
-  <*> limitOption
-  )
+  (SearchCustomFood <$> parserO <*> parserO <*> parserO <*> parserO)
   (fullDesc <> progDesc "Search your custom foods matching the given filters")
 
 viewCustomFood :: Mod CommandFields Command
 viewCustomFood = command "view" $ info
-  (   ViewCustomFood
-  <$> verbosityOption
-  <*> idFoodViewOption
-  <*> viewFoodAmountOption
-  )
+  (ViewCustomFood <$> parserO <*> parserM <*> parserO)
   (fullDesc <> progDesc "View nutrients of food of a specific amount")
-
 
 parseCustomFoodCommands :: Mod CommandFields Command
 parseCustomFoodCommands = command "custom" $ info

@@ -3,9 +3,9 @@ module Parse.Nutrients
   ) where
 import           Model.Command                  ( Command(UpdateTargets) )
 import           Options.Applicative
-import           Parse.Common                   ( nutrientsOption )
+import           Typeclass.Parsed               ( ParsedMandatory(parserM) )
 
 parseUpdateNutrients :: Mod CommandFields Command
 parseUpdateNutrients = command "nutrients" $ info
-  (UpdateTargets <$> nutrientsOption)
+  (UpdateTargets <$> parserM)
   (fullDesc <> progDesc "Update target nutrients")
